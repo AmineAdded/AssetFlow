@@ -1,2 +1,11 @@
+# Dossiers de build - jamais commiter
 bin/
 obj/
+
+# Fichiers VS
+.vs/
+*.user
+
+# Fichiers système
+.DS_Store
+Thumbs.db
