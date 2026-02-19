@@ -19,7 +19,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // ==========================================
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5164/") // URL de l'API ASP.NET
+    BaseAddress = new Uri("http://localhost:5235/") // URL de l'API ASP.NET
 });
 
 // ==========================================
