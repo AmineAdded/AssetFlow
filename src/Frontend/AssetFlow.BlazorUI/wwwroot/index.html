@@ -9,17 +9,104 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="AssetFlow.BlazorUI.styles.css" rel="stylesheet" />
+
     <style>
-        #blazor-error-ui { display: none; }
-        .loading-progress { display: none; }
-        .loading-progress-text { display: none; }
+        /* ================================================
+           LOADING NATIF — s'affiche IMMÉDIATEMENT
+           Avant que Blazor ne soit chargé
+           ================================================ */
+        #native-loading {
+            position: fixed;
+            inset: 0;
+            background: #0F1E3C;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            gap: 1.5rem;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #native-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #native-loading img {
+            width: 300px;
+            height: 250px;
+            object-fit: contain;
+            animation: nativePulse 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 28px rgba(19,109,236,0.8));
+        }
+
+        @keyframes nativePulse {
+            0%,100% { transform: scale(1);     filter: drop-shadow(0 0 18px rgba(19,109,236,0.6)); }
+            50%      { transform: scale(1.06);  filter: drop-shadow(0 0 36px rgba(19,109,236,1)); }
+        }
+
+        #native-loading .nl-tagline {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.5px;
+            animation: nlFadeIn 0.6s ease 0.4s both;
+        }
+
+        #native-loading .nl-bar-wrap {
+            width: 180px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 99px;
+            overflow: hidden;
+            animation: nlFadeIn 0.6s ease 0.6s both;
+        }
+
+        #native-loading .nl-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #136dec, #60a5fa);
+            border-radius: 99px;
+            animation: nlProgress 3s ease 0.5s forwards;
+        }
+
+        @keyframes nlFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes nlProgress {
+            0%   { width: 0%; }
+            20%  { width: 25%; }
+            50%  { width: 60%; }
+            80%  { width: 85%; }
+            100% { width: 100%; }
+        }
+
+        /* Cacher les éléments Blazor par défaut */
+        #blazor-error-ui { display: none !important; }
+        .loading-progress { display: none !important; }
+        .loading-progress-text { display: none !important; }
     </style>
 </head>
 
 <body>
-    <div id="app">
-        <div class="loading-progress-text"></div>
+
+    <!-- ================================================
+         LOADING NATIF HTML : visible INSTANTANÉMENT
+         Disparaît quand Blazor est prêt
+         ================================================ -->
+    <div id="native-loading">
+        <img src="images/logo.png" alt="AssetFlow" />
+        <p class="nl-tagline">Système intelligent de gestion de stock</p>
+        <div class="nl-bar-wrap">
+            <div class="nl-bar"></div>
+        </div>
     </div>
+
+    <!-- Blazor s'injecte ici -->
+    <div id="app"></div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -28,6 +115,29 @@
     </div>
 
     <script src="_framework/blazor.webassembly.js"></script>
+
+    <script>
+        // Masquer le loading natif quand Blazor est prêt
+        // On observe quand #app reçoit du contenu
+        const observer = new MutationObserver(function () {
+            const app = document.getElementById('app');
+            if (app && app.children.length > 0) {
+                const loader = document.getElementById('native-loading');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    // Supprimer du DOM après la transition
+                    setTimeout(() => loader.remove(), 600);
+                }
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.getElementById('app'), {
+            childList: true,
+            subtree: true
+        });
+    </script>
+
 </body>
 
 </html>

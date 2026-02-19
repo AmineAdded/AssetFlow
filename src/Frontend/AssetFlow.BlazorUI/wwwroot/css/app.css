@@ -78,8 +78,8 @@ body {
 }
 
 .loading-logo {
-    width: 200px;
-    height: 150px;
+    width: 300px;
+    height: 200px;
     object-fit: contain;
     animation: logoPulse 1.5s ease-in-out infinite;
     filter: drop-shadow(0 0 28px rgba(19,109,236,0.8));
@@ -181,8 +181,8 @@ body {
 
 /* Logo plus grand sur la page de sélection */
 .role-select-logo {
-    width: 200px;
-    height: 150px;
+    width: 300px;
+    height: 200px;
     object-fit: contain;
     margin-bottom: 1rem;
     filter: drop-shadow(0 4px 16px rgba(19,109,236,0.4));
@@ -295,7 +295,7 @@ html.dark .role-card:hover {
 }
 
 .left-panel {
-    width: 42%;
+    width: 32%;
     background: var(--navy);
     color: white;
     display: flex;
@@ -332,8 +332,8 @@ html.dark .left-panel { background: #060d18; }
 
 /* Logo GRAND dans le panneau gauche */
 .panel-logo {
-    width: 200px;
-    height: 150px;
+    width: 300px;
+    height: 200px;
     object-fit: contain;
     filter: drop-shadow(0 0 22px rgba(19,109,236,0.6));
 }
@@ -707,7 +707,7 @@ html.dark .left-panel { background: #060d18; }
 
 .back-link a:hover { color: var(--text-muted); }
 
-.text-center { text-align: center; font-size: 0.875rem; color: var(--text-muted); }
+.text-center { text-align: center; font-size: 0.875rem; color: var(--text-muted);margin-bottom: 20px; }
 
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(16px); }
