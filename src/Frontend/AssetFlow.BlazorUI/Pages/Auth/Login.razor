@@ -1,93 +1,102 @@
-@* ============================================================
-   AssetFlow.BlazorUI / Pages / Auth / Login.razor
-   Page de connexion (Image 3 du wireframe)
-   Layout : Panneau bleu gauche + Formulaire droite
-   ============================================================ *@
-
+@* Login.razor *@
 @page "/login"
 @using AssetFlow.BlazorUI.Components
 
 <div class="login-page">
 
-    @* === PANNEAU GAUCHE BLEU === *@
     <div class="left-panel">
-
-        @* Logo *@
-        <img src="images/logo.png" alt="AssetFlow" class="panel-logo" />
-
-        @* Badge du rôle (couleur selon le rôle) *@
-        <div class="role-badge" style="background-color: @RoleColor">
-            @RoleLabel
+        <div class="left-panel-content">
+            <img src="images/logo.png" alt="AssetFlow" class="panel-logo" />
+            <div class="panel-app-name">Asset<span style="color:var(--primary)">Flow</span></div>
+            <p class="panel-app-subtitle">Système intelligent de gestion de stock</p>
+            <div class="role-badge" style="background-color: @RoleColor">@RoleLabel</div>
+            <p class="role-desc-text">@RoleDescription</p>
+            <ul class="features-list">
+                <li class="feature-item">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                    </div>
+                    <div class="feature-text-block">
+                        <h4>OCR Intelligent</h4>
+                        <p>Reconnaissance optique automatique</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></svg>
+                    </div>
+                    <div class="feature-text-block">
+                        <h4>Prédictions IA</h4>
+                        <p>Modèles de prédiction avancés</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    </div>
+                    <div class="feature-text-block">
+                        <h4>Alertes Temps Réel</h4>
+                        <p>Notifications instantanées</p>
+                    </div>
+                </li>
+            </ul>
         </div>
-
-        @* Description du rôle *@
-        <p class="role-description">@RoleDescription</p>
-
-        @* Fonctionnalités *@
-        <ul class="features-list">
-            <li>📄 OCR Intelligent</li>
-            <li>🧠 Prédictions IA</li>
-            <li>🔔 Alertes Temps Réel</li>
-        </ul>
-
     </div>
 
-    @* === PANNEAU DROIT : FORMULAIRE === *@
     <div class="right-panel">
+        <div class="form-container">
 
-        <h1 class="form-title">Connexion @RoleLabel</h1>
-        <p class="form-subtitle">Entrez vos identifiants pour accéder au système</p>
+            <div class="form-header">
+                <h1 class="form-title">Bienvenue</h1>
+                <p class="form-subtitle">Veuillez vous identifier pour continuer.</p>
+            </div>
 
-        @* Message d'erreur *@
-        @if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <div class="alert alert-error">@ErrorMessage</div>
-        }
-
-        @* Champ Email *@
-        <InputField
-            Label="Adresse email"
-            Placeholder="nom@example.com"
-            @bind-Value="Email"
-            InputType="email"
-            HasError="EmailError"
-            ErrorMessage="Adresse email invalide" />
-
-        @* Champ Mot de passe *@
-        <InputField
-            Label="Mot de passe"
-            Placeholder="••••••••"
-            @bind-Value="Password"
-            InputType="password"
-            ShowPasswordToggle="true" />
-
-        @* Se souvenir + Mot de passe oublié *@
-        <div class="form-options">
-            <label class="checkbox-label">
-                <input type="checkbox" @bind="RememberMe" />
-                Se souvenir de moi
-            </label>
-            <a href="/forgot-password" class="link">Mot de passe oublié?</a>
-        </div>
-
-        @* Bouton de connexion *@
-        <button class="btn-primary"
-                @onclick="HandleLogin"
-                disabled="@IsLoading">
-            @if (IsLoading)
+            @if (!string.IsNullOrEmpty(ErrorMessage))
             {
-                <span>Connexion en cours...</span>
+                <div class="alert alert-error">@ErrorMessage</div>
             }
-            else
-            {
-                <span>Se connecter</span>
-            }
-        </button>
 
-        @* Retour à la sélection de rôle *@
-        <div class="back-link">
-            <a href="/role-select">← Changer de rôle</a>
+            <InputField Label="E-mail" Placeholder="votre@email.com"
+                @bind-Value="Email" InputType="email"
+                HasError="EmailError" ErrorMessage="Adresse email invalide" />
+
+            <InputField Label="Mot de passe" Placeholder="••••••••"
+                @bind-Value="Password" InputType="password" ShowPasswordToggle="true" />
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" @bind="RememberMe" />
+                    Se souvenir de moi
+                </label>
+                <a href="/forgot-password" class="link">Mot de passe oublié ?</a>
+            </div>
+
+            <button class="btn-primary" @onclick="HandleLogin" disabled="@IsLoading">
+                @(IsLoading ? "Connexion en cours..." : "Se connecter")
+            </button>
+
+            <div class="divider"><span>OU</span></div>
+
+            @* Lien vers Register *@
+            <p class="text-center">
+                Pas encore de compte ? <a href="/register" class="link">Créer un compte</a>
+            </p>
+
+            @* Badges rôles *@
+            <div style="margin-top:1.5rem;">
+                <p style="font-size:0.72rem;font-weight:700;color:var(--text-faint);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:0.5rem;">Accès par rôle</p>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem;">
+                    @foreach (var r in new[]{"Admin","IT","Équipe Achat","Employé"})
+                    {
+                        <span style="padding:0.3rem 0.8rem;border-radius:var(--radius);background:var(--surface-2);border:1px solid var(--border);color:var(--text-muted);font-size:0.76rem;font-weight:600;">@r</span>
+                    }
+                </div>
+            </div>
+
+            <div class="back-link"><a href="/">← Changer de rôle</a></div>
+
         </div>
-
+        <div class="legal-footer"><p>© 2025 AssetFlow Technologies. Tous droits réservés.</p></div>
     </div>
+
 </div>

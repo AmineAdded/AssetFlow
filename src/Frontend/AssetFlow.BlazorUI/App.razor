@@ -1,10 +1,26 @@
-﻿@* App.razor — simplifié sans Layout ni NotFound *@
+﻿@* ============================================================
+   App.razor — Racine de l'application
+   Contient : Loading screen + Toggle dark mode + Router
+   ============================================================ *@
+
 @using AssetFlow.BlazorUI.Layout
+@using AssetFlow.BlazorUI.Components
+
+@* Écran de chargement au démarrage *@
+<LoadingScreen />
+
+@* Bouton dark/light mode — visible sur toutes les pages *@
+<ThemeToggle />
+
+@* Routeur Blazor *@
 <Router AppAssembly="typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(EmptyLayout)"/>
+        <RouteView RouteData="routeData" DefaultLayout="typeof(EmptyLayout)" />
     </Found>
     <NotFound>
-        <p>Page introuvable.</p>
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;">
+            <p style="font-size:1.2rem;color:var(--text-muted);">Page introuvable.</p>
+            <a href="/" style="color:var(--primary);">← Retour à l'accueil</a>
+        </div>
     </NotFound>
 </Router>

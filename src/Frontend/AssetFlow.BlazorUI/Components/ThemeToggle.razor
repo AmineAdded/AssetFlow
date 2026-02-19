@@ -1,0 +1,19 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Components / ThemeToggle.razor
+   Bouton flottant Dark/Light mode
+   Injecter dans App.razor pour qu'il soit visible partout
+   ============================================================ *@
+
+<button class="theme-toggle"
+        @onclick="ToggleTheme"
+        title="@(IsDark ? "Mode clair" : "Mode sombre")">
+    @if (IsDark)
+    {
+        <span>☀️</span>  @* Soleil = passer en mode clair *@
+    }
+    else
+    {
+        <span>🌙</span>  @* Lune = passer en mode sombre *@
+    }
+</button>
+

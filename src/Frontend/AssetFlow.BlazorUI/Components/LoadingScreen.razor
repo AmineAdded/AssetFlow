@@ -1,0 +1,17 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Components / LoadingScreen.razor
+   Écran de chargement animé au démarrage
+   S'affiche 3 secondes puis disparaît automatiquement
+   ============================================================ *@
+
+@if (IsVisible)
+{
+    <div class="loading-screen">
+        <img src="images/logo.png" alt="AssetFlow" class="loading-logo" />
+        <div class="loading-app-name">Asset<span>Flow</span></div>
+        <p class="loading-tagline">Système intelligent de gestion de stock</p>
+        <div class="loading-bar-wrap">
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+}
