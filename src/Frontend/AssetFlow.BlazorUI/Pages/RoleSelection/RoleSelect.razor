@@ -1,0 +1,47 @@
+@page "/"
+
+@namespace AssetFlow.BlazorUI.Pages.Auth
+@using Microsoft.AspNetCore.Components
+@using AssetFlow.BlazorUI.Components
+
+<div class="role-select-page">
+
+    <div class="logo-section">
+        <img src="images/logo.png" alt="AssetFlow Logo" class="logo" />
+        <p class="subtitle">Sélectionnez votre rôle pour continuer</p>
+    </div>
+
+    <div class="roles-container">
+
+        <RoleCard
+            Title="IT"
+            Description="Gestion du matériel, affectations, demandes d'achat, prédictions IA"
+            IconClass="🖥️"
+            CardColor="#7C3AED"
+            OnSelect="@(() => SelectRole("IT"))" />
+
+        <RoleCard
+            Title="Équipe Achat"
+            Description="Réception demandes, gestion offres, OCR automatique, scoring IA"
+            IconClass="🛒"
+            CardColor="#10B981"
+            OnSelect="@(() => SelectRole("EquipeAchat"))" />
+
+        <RoleCard
+            Title="Employé"
+            Description="Consultation équipements affectés, signalement incidents, QR codes"
+            IconClass="👤"
+            CardColor="#F59E0B"
+            OnSelect="@(() => SelectRole("Employe"))" />
+
+    </div>
+
+    <div class="admin-hint">
+        <p>Mode avancé : tapez 'admin' pour accéder</p>
+        <input type="text"
+               @bind="AdminInput"
+               @oninput="CheckAdminMode"
+               style="opacity:0; position:absolute;" />
+    </div>
+
+</div>

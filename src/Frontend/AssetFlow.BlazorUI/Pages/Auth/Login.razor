@@ -1,0 +1,93 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Pages / Auth / Login.razor
+   Page de connexion (Image 3 du wireframe)
+   Layout : Panneau bleu gauche + Formulaire droite
+   ============================================================ *@
+
+@page "/login"
+@using AssetFlow.BlazorUI.Components
+
+<div class="login-page">
+
+    @* === PANNEAU GAUCHE BLEU === *@
+    <div class="left-panel">
+
+        @* Logo *@
+        <img src="images/logo.png" alt="AssetFlow" class="panel-logo" />
+
+        @* Badge du rôle (couleur selon le rôle) *@
+        <div class="role-badge" style="background-color: @RoleColor">
+            @RoleLabel
+        </div>
+
+        @* Description du rôle *@
+        <p class="role-description">@RoleDescription</p>
+
+        @* Fonctionnalités *@
+        <ul class="features-list">
+            <li>📄 OCR Intelligent</li>
+            <li>🧠 Prédictions IA</li>
+            <li>🔔 Alertes Temps Réel</li>
+        </ul>
+
+    </div>
+
+    @* === PANNEAU DROIT : FORMULAIRE === *@
+    <div class="right-panel">
+
+        <h1 class="form-title">Connexion @RoleLabel</h1>
+        <p class="form-subtitle">Entrez vos identifiants pour accéder au système</p>
+
+        @* Message d'erreur *@
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-error">@ErrorMessage</div>
+        }
+
+        @* Champ Email *@
+        <InputField
+            Label="Adresse email"
+            Placeholder="nom@example.com"
+            @bind-Value="Email"
+            InputType="email"
+            HasError="EmailError"
+            ErrorMessage="Adresse email invalide" />
+
+        @* Champ Mot de passe *@
+        <InputField
+            Label="Mot de passe"
+            Placeholder="••••••••"
+            @bind-Value="Password"
+            InputType="password"
+            ShowPasswordToggle="true" />
+
+        @* Se souvenir + Mot de passe oublié *@
+        <div class="form-options">
+            <label class="checkbox-label">
+                <input type="checkbox" @bind="RememberMe" />
+                Se souvenir de moi
+            </label>
+            <a href="/forgot-password" class="link">Mot de passe oublié?</a>
+        </div>
+
+        @* Bouton de connexion *@
+        <button class="btn-primary"
+                @onclick="HandleLogin"
+                disabled="@IsLoading">
+            @if (IsLoading)
+            {
+                <span>Connexion en cours...</span>
+            }
+            else
+            {
+                <span>Se connecter</span>
+            }
+        </button>
+
+        @* Retour à la sélection de rôle *@
+        <div class="back-link">
+            <a href="/role-select">← Changer de rôle</a>
+        </div>
+
+    </div>
+</div>

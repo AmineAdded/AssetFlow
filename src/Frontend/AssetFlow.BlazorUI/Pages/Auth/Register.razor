@@ -1,0 +1,154 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Pages / Auth / Register.razor
+   Page d'inscription (Image 2 du wireframe)
+   Layout : Panneau bleu gauche + Formulaire droite
+   ============================================================ *@
+
+@page "/register"
+@using AssetFlow.BlazorUI.Components
+
+<div class="login-page"> @* Même layout que login *@
+
+    @* === PANNEAU GAUCHE BLEU === *@
+    <div class="left-panel">
+        <img src="images/logo.png" alt="AssetFlow" class="panel-logo" />
+        <h2>Rejoignez AssetFlow</h2>
+        <p class="panel-subtitle">Système intelligent de gestion de stock</p>
+
+        <ul class="features-list">
+            <li>🤖 Gestion automatisée</li>
+            <li>🧠 Intelligence artificielle</li>
+            <li>🔔 Alertes temps réel</li>
+        </ul>
+    </div>
+
+    @* === PANNEAU DROIT : FORMULAIRE D'INSCRIPTION === *@
+    <div class="right-panel">
+
+        <h1 class="form-title">Créer un compte</h1>
+        <p class="form-subtitle">Remplissez le formulaire pour demander l'accès au système</p>
+
+        @* Messages de feedback *@
+        @if (!string.IsNullOrEmpty(SuccessMessage))
+        {
+            <div class="alert alert-success">@SuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-error">@ErrorMessage</div>
+        }
+
+        @* Prénom + Nom sur la même ligne *@
+        <div class="form-row">
+            <InputField Label="Prénom" Placeholder="Mohamed" @bind-Value="FirstName" />
+            <InputField Label="Nom" Placeholder="Maddeh" @bind-Value="LastName" />
+        </div>
+
+        @* Email *@
+        <InputField
+            Label="Adresse email professionnelle"
+            Placeholder="nom@example.com"
+            @bind-Value="Email"
+            InputType="email"
+            HelperText="Vous recevrez un email de confirmation" />
+
+        @* Mot de passe + Confirmation *@
+        <div class="form-row">
+            <InputField
+                Label="Mot de passe"
+                Placeholder="••••••••"
+                @bind-Value="Password"
+                InputType="password"
+                ShowPasswordToggle="true" />
+
+            <InputField
+                Label="Confirmer mot de passe"
+                Placeholder="••••••••"
+                @bind-Value="ConfirmPassword"
+                InputType="password"
+                ShowPasswordToggle="true" />
+        </div>
+
+        @* Barre de force du mot de passe *@
+        <div class="password-strength">
+            <div class="strength-bar">
+                <div class="strength-segment @(PasswordStrength >= 1 ? "active weak" : "")"></div>
+                <div class="strength-segment @(PasswordStrength >= 2 ? "active medium" : "")"></div>
+                <div class="strength-segment @(PasswordStrength >= 3 ? "active strong" : "")"></div>
+            </div>
+            <small>Min. 8 caractères, 1 majuscule, 1 chiffre</small>
+        </div>
+
+        @* Département *@
+        <InputField
+            Label="Département"
+            Placeholder="Ex: IT, Production, Logistique"
+            @bind-Value="Department" />
+
+        @* Sélection du rôle via cartes *@
+        <div class="role-selection">
+            <label class="field-label">Rôle demandé</label>
+            <div class="role-cards-row">
+
+                <div class="role-card-small @(SelectedRole == "IT" ? "selected" : "")"
+                     @onclick='() => SelectedRole = "IT"'>
+                    <input type="radio" name="role" checked="@(SelectedRole == "IT")" />
+                    <span class="role-icon">🖥️</span>
+                    <div>
+                        <strong>IT</strong>
+                        <small>Gestion matériel & demandes</small>
+                    </div>
+                </div>
+
+                <div class="role-card-small @(SelectedRole == "EquipeAchat" ? "selected" : "")"
+                     @onclick='() => SelectedRole = "EquipeAchat"'>
+                    <input type="radio" name="role" checked="@(SelectedRole == "EquipeAchat")" />
+                    <span class="role-icon">🛒</span>
+                    <div>
+                        <strong>Équipe Achat</strong>
+                        <small>Gestion offres & stock</small>
+                    </div>
+                </div>
+
+                <div class="role-card-small @(SelectedRole == "Employe" ? "selected" : "")"
+                     @onclick='() => SelectedRole = "Employe"'>
+                    <input type="radio" name="role" checked="@(SelectedRole == "Employe")" />
+                    <span class="role-icon">👤</span>
+                    <div>
+                        <strong>Employé</strong>
+                        <small>Consultation équipements</small>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        @* Info : approbation admin *@
+        <div class="info-box">
+            <span>ℹ️</span>
+            <span>Votre demande sera examinée par un administrateur avant activation</span>
+        </div>
+
+        @* Case à cocher conditions *@
+        <label class="checkbox-label">
+            <input type="checkbox" @bind="AcceptTerms" />
+            J'accepte les conditions d'utilisation et la politique de confidentialité
+        </label>
+
+        @* Bouton de soumission *@
+        <button class="btn-primary"
+                @onclick="HandleRegister"
+                disabled="@(IsLoading || !AcceptTerms)">
+            @(IsLoading ? "Création en cours..." : "Créer mon compte")
+        </button>
+
+        @* Séparateur *@
+        <div class="divider"><span>OU</span></div>
+
+        @* Lien vers login *@
+        <p class="text-center">
+            Vous avez déjà un compte ? <a href="/role-select" class="link">Se connecter</a>
+        </p>
+
+    </div>
+</div>

@@ -1,0 +1,67 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Components / InputField.razor
+   Composant réutilisable : champ de saisie avec label, erreur...
+   Utilisé dans Login, Register et autres formulaires
+   ============================================================ *@
+
+<div class="input-group">
+
+    @* Label *@
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="field-label">@Label</label>
+    }
+
+    @* Conteneur input + icône *@
+    <div class="input-wrapper @(HasError ? "has-error" : "")">
+
+        @if (InputType == "password")
+        {
+            @* Champ mot de passe avec toggle visibilité *@
+            <input type="@(ShowPassword ? "text" : "password")"
+                   placeholder="@Placeholder"
+                   value="@Value"
+                   @oninput="OnInput"
+                   class="form-input" />
+
+            @if (ShowPasswordToggle)
+            {
+                <button type="button" class="toggle-password" @onclick="TogglePassword">
+                    @(ShowPassword ? "🙈" : "👁️")
+                </button>
+            }
+        }
+        else
+        {
+            @* Champ texte/email normal *@
+            <input type="@InputType"
+                   placeholder="@Placeholder"
+                   value="@Value"
+                   @oninput="OnInput"
+                   class="form-input" />
+
+            @if (HasError)
+            {
+                <span class="error-icon">⚠️</span>
+            }
+        }
+
+    </div>
+
+    @* Message d'erreur *@
+    @if (HasError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <span class="error-text">@ErrorMessage</span>
+    }
+
+    @* Texte d'aide *@
+    @if (!HasError && !string.IsNullOrEmpty(HelperText))
+    {
+        <span class="helper-text">@HelperText</span>
+    }
+
+</div>
+
+@code {
+    // Voir InputField.razor.cs pour la logique
+}

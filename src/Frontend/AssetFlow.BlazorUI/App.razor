@@ -1,0 +1,10 @@
+﻿@* App.razor — simplifié sans Layout ni NotFound *@
+@using AssetFlow.BlazorUI.Layout
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(EmptyLayout)"/>
+    </Found>
+    <NotFound>
+        <p>Page introuvable.</p>
+    </NotFound>
+</Router>

@@ -1,0 +1,29 @@
+@* ============================================================
+   AssetFlow.BlazorUI / Components / RoleCard.razor
+   Composant : Carte de sélection de rôle
+   Utilisé dans la page RoleSelect
+   ============================================================ *@
+
+<div class="role-card" @onclick="HandleClick">
+
+    @* Icône du rôle *@
+    <div class="role-icon-container" style="color: @CardColor; font-size: 3rem;">
+        @IconClass
+    </div>
+
+    @* Titre du rôle *@
+    <h3 class="role-title">@Title</h3>
+
+    @* Description *@
+    <p class="role-description-text">@Description</p>
+
+    @* Bouton *@
+    <button class="btn-role" style="background-color: @CardColor; color: white;">
+        Continuer →
+    </button>
+
+</div>
+
+@code {
+    // Voir RoleCard.razor.cs pour la logique
+}
