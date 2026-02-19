@@ -1,0 +1,244 @@
+/* ============================================================
+   Register.razor.css — Styles spécifiques à la page Register
+   Isolé : n'affecte aucune autre page
+   ============================================================ */
+
+/* === LAYOUT (partagé avec Login — même structure) === */
+.login-page {
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.left-panel {
+    width: 32%;
+    background: var(--navy);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+html.dark .left-panel { background: #060d18; }
+
+.left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 33%;
+    background: linear-gradient(to top, rgba(19,109,236,0.12), transparent);
+    pointer-events: none;
+}
+
+.left-panel-content {
+    max-width: 340px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.5s ease 0.1s both;
+}
+
+.panel-logo {
+    width: 300px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 22px rgba(19,109,236,0.6));
+}
+
+.panel-app-name {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    text-align: center;
+}
+
+.panel-app-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.45);
+    text-align: center;
+    margin-top: -1rem;
+}
+
+.features-list {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.feature-item { display: flex; align-items: center; gap: 0.875rem; }
+
+.feature-icon-box {
+    width: 40px; height: 40px;
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--transition);
+}
+.feature-icon-box svg {
+    width: 18px; height: 18px; stroke: white; fill: none;
+    stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.feature-item:hover .feature-icon-box { background: rgba(19,109,236,0.25); }
+.feature-text-block h4 { font-size: 0.875rem; font-weight: 600; color: white; }
+.feature-text-block p  { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
+
+/* === PANNEAU DROIT === */
+.right-panel {
+    flex: 1;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 3.5rem;
+    overflow-y: auto;
+    position: relative;
+    transition: background var(--transition);
+}
+
+.form-container {
+    width: 100%;
+    max-width: 420px;
+    animation: slideUp 0.5s ease 0.2s both;
+}
+
+.form-header { margin-bottom: 1.5rem; }
+
+.form-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+}
+
+.form-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.legal-footer { position: absolute; bottom: 1rem; text-align: center; width: 100%; }
+.legal-footer p { font-size: 0.72rem; color: var(--text-faint); }
+
+.text-center { text-align: center; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 20px; }
+
+.divider {
+    display: flex; align-items: center;
+    gap: 0.75rem; margin: 1rem 0;
+    color: var(--text-faint); font-size: 0.8rem;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.checkbox-label {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.83rem; color: var(--text-muted); cursor: pointer;
+}
+.checkbox-label input[type="checkbox"] { accent-color: var(--primary); }
+
+/* === SPÉCIFIQUE REGISTER === */
+
+/* Barre de force mot de passe */
+.password-strength { margin-bottom: 0.5rem; }
+.strength-bar { display: flex; gap: 3px; margin-bottom: 0.2rem; }
+.strength-segment {
+    flex: 1; height: 3px; background: var(--border);
+    border-radius: 99px; transition: background 0.3s ease;
+}
+.strength-segment.active.weak   { background: #ef4444; }
+.strength-segment.active.medium { background: #f97316; }
+.strength-segment.active.strong { background: #22c55e; }
+
+/* Sélection de rôle */
+.role-selection { margin-bottom: 0.5rem; }
+.role-cards-row { display: flex; gap: 0.5rem; margin-top: 0.35rem; }
+
+.role-card-small {
+    flex: 1; padding: 0.6rem 0.4rem;
+    border: 2px solid var(--border); border-radius: var(--radius-lg);
+    cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; text-align: center; gap: 0.25rem;
+    transition: border-color var(--transition), background var(--transition);
+    background: var(--surface);
+}
+.role-card-small.selected { border-color: var(--primary); background: rgba(19,109,236,0.06); }
+.role-card-small svg {
+    width: 20px; height: 20px; stroke: var(--text-muted); fill: none;
+    stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.role-card-small.selected svg { stroke: var(--primary); }
+.role-card-small input[type="radio"] { display: none; }
+.role-card-small strong { font-size: 0.78rem; font-weight: 700; color: var(--text); display: block; }
+.role-card-small small  { font-size: 0.68rem; color: var(--text-faint); display: block; }
+
+/* Info box */
+.info-box {
+    display: flex; gap: 0.5rem; align-items: flex-start;
+    padding: 0.6rem 0.875rem;
+    background: rgba(19,109,236,0.07);
+    border: 1px solid rgba(19,109,236,0.18);
+    border-radius: var(--radius-lg);
+    font-size: 0.8rem; color: var(--primary);
+    margin: 0.5rem 0; line-height: 1.5;
+}
+.info-box svg {
+    width: 15px; height: 15px; stroke: var(--primary); fill: none;
+    stroke-width: 2; flex-shrink: 0; margin-top: 1px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+    .left-panel { width: 36%; padding: 2rem 1.5rem; }
+    .panel-logo { width: 220px; height: 150px; }
+    .right-panel { padding: 1.5rem 2.5rem; }
+}
+
+@media (max-width: 768px) {
+    .login-page { flex-direction: column; overflow-y: auto; }
+
+    .left-panel {
+        width: 100%; min-height: auto; padding: 1rem 1.5rem;
+        flex-direction: row; justify-content: center;
+    }
+    .left-panel::after { display: none; }
+
+    .left-panel-content {
+        flex-direction: row; align-items: center;
+        justify-content: center; gap: 1rem;
+        max-width: 100%; animation: none;
+    }
+
+    .panel-logo { width: 90px; height: 56px; flex-shrink: 0; }
+    .panel-app-subtitle, .features-list, .panel-app-name { display: none; }
+
+    .right-panel { flex: 1; padding: 1.5rem 1.25rem 3rem; justify-content: flex-start; overflow-y: visible; }
+    .form-container { max-width: 100%; animation: none; }
+    .form-title { font-size: 1.5rem; }
+    .form-header { margin-bottom: 1.25rem; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .form-input { padding: 0.75rem 1rem; font-size: 1rem; }
+    .btn-primary { padding: 0.875rem; font-size: 1rem; }
+    .legal-footer { position: relative; bottom: auto; padding: 1.5rem 0 0.5rem; }
+    .theme-toggle { top: auto; bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
+}
+
+@media (max-width: 480px) {
+    .left-panel { padding: 0.875rem 1rem; }
+    .panel-logo { width: 72px; height: 44px; }
+    .right-panel { padding: 1.25rem 1rem 3rem; }
+    .form-title { font-size: 1.35rem; }
+    .role-cards-row { gap: 0.35rem; }
+    .role-card-small { padding: 0.5rem 0.3rem; }
+    .role-card-small strong { font-size: 0.72rem; }
+    .role-card-small small { display: none; }
+}
