@@ -188,15 +188,6 @@ body {
     filter: drop-shadow(0 4px 16px rgba(19,109,236,0.4));
 }
 
-.role-select-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.5px;
-}
-
-.role-select-title span { color: var(--primary); }
-
 .role-select-subtitle {
     color: var(--text-faint);
     font-size: 0.9rem;
@@ -336,14 +327,6 @@ html.dark .left-panel { background: #060d18; }
     height: 200px;
     object-fit: contain;
     filter: drop-shadow(0 0 22px rgba(19,109,236,0.6));
-}
-
-.panel-app-name {
-    font-size: 2rem;
-    font-weight: 800;
-    color: white;
-    letter-spacing: -0.5px;
-    text-align: center;
 }
 
 .panel-app-subtitle {
