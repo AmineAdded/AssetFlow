@@ -58,6 +58,7 @@ namespace AssetFlow.Infrastructure.Services
                 tokenUrl,
                 new FormUrlEncodedContent(formData)
             );
+            Console.WriteLine($"Keycloak response status: {response.StatusCode}");
 
             // Si Keycloak refuse (mauvais mdp, utilisateur bloqué...)
             if (!response.IsSuccessStatusCode)
