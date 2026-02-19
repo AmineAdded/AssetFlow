@@ -690,9 +690,199 @@ html.dark .left-panel { background: #060d18; }
 
 .back-link a:hover { color: var(--text-muted); }
 
-.text-center { text-align: center; font-size: 0.875rem; color: var(--text-muted);margin-bottom: 20px; }
+.text-center { text-align: center; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 20px; }
 
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   RESPONSIVE — Ajouté à la fin, CSS original intact
+   ============================================================ */
+
+/* === TABLETTE (max 1024px) === */
+@media (max-width: 1024px) {
+    .left-panel { width: 36%; padding: 2rem 1.5rem; }
+    .panel-logo { width: 220px; height: 150px; }
+    .role-desc-text { display: none; }
+    .right-panel { padding: 1.5rem 2.5rem; }
+}
+
+/* === MOBILE (max 768px) === */
+@media (max-width: 768px) {
+
+    /* Layout vertical : panneau navy en bandeau haut */
+    .login-page {
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    /* Bandeau compact en haut */
+    .left-panel {
+        width: 100%;
+        min-height: auto;
+        padding: 1rem 1.5rem;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .left-panel::after { display: none; }
+
+    /* Contenu horizontal : logo + badge centrés */
+    .left-panel-content {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        max-width: 100%;
+        animation: none;
+    }
+
+    /* Logo petit dans le bandeau */
+    .panel-logo { width: 90px; height: 56px; flex-shrink: 0; }
+
+    /* Cacher tout sauf le badge rôle sur mobile */
+    .panel-app-subtitle,
+    .role-desc-text,
+    .features-list { display: none; }
+
+    /* Badge rôle reste visible */
+    .role-badge { padding: 0.25rem 0.875rem; font-size: 0.8rem; }
+
+    /* Panneau droit : formulaire pleine largeur */
+    .right-panel {
+        flex: 1;
+        padding: 1.5rem 1.25rem 3rem;
+        justify-content: flex-start;
+        overflow-y: visible;
+    }
+
+    .form-container { max-width: 100%; animation: none; }
+
+    .form-title { font-size: 1.5rem; }
+    .form-header { margin-bottom: 1.25rem; }
+
+    /* Colonnes → 1 colonne */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+
+    /* Inputs plus grands (touch-friendly) */
+    .form-input { padding: 0.75rem 1rem; font-size: 1rem; }
+    .btn-primary { padding: 0.875rem; font-size: 1rem; }
+
+    /* Footer non absolu sur mobile */
+    .legal-footer {
+        position: relative;
+        bottom: auto;
+        padding: 1.5rem 0 0.5rem;
+    }
+
+    /* Bouton dark mode en bas à droite */
+    .theme-toggle { top: auto; bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
+}
+
+/* === TRÈS PETIT MOBILE (max 480px) === */
+@media (max-width: 480px) {
+    .left-panel { padding: 0.875rem 1rem; }
+    .panel-logo { width: 72px; height: 44px; }
+    .right-panel { padding: 1.25rem 1rem 3rem; }
+    .form-title { font-size: 1.35rem; }
+
+    /* Cartes rôle en colonne */
+    .role-cards-row { flex-direction: column; }
+    .role-card-small {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 0.6rem 0.75rem;
+        gap: 0.6rem;
+    }
+    .role-card-small strong { font-size: 0.85rem; }
+    .role-card-small small { font-size: 0.72rem; }
+}
+
+/* ============================================================
+   RESPONSIVE — Ajouté à la fin, CSS original intact à 100%
+   ============================================================ */
+
+/* === TABLETTE (max 1024px) === */
+@media (max-width: 1024px) {
+    .left-panel { width: 36%; padding: 2rem 1.5rem; }
+    .panel-logo { width: 220px; height: 150px; }
+    .role-desc-text { display: none; }
+    .right-panel { padding: 1.5rem 2.5rem; }
+}
+
+/* === MOBILE (max 768px) === */
+@media (max-width: 768px) {
+
+    .login-page { flex-direction: column; min-height: 100vh; overflow-y: auto; }
+
+    /* Bandeau navy compact en haut */
+    .left-panel {
+        width: 100%;
+        min-height: auto;
+        padding: 1rem 1.5rem;
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .left-panel::after { display: none; }
+
+    /* Logo + badge côte à côte */
+    .left-panel-content {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        max-width: 100%;
+        animation: none;
+    }
+
+    .panel-logo { width: 90px; height: 56px; flex-shrink: 0; }
+
+    /* Cacher le non-essentiel sur mobile */
+    .panel-app-subtitle,
+    .role-desc-text,
+    .features-list { display: none; }
+
+    .role-badge { padding: 0.25rem 0.875rem; font-size: 0.8rem; }
+
+    /* Formulaire pleine largeur */
+    .right-panel {
+        flex: 1;
+        padding: 1.5rem 1.25rem 3rem;
+        justify-content: flex-start;
+        overflow-y: visible;
+    }
+
+    .form-container { max-width: 100%; animation: none; }
+    .form-title { font-size: 1.5rem; }
+    .form-header { margin-bottom: 1.25rem; }
+
+    /* 2 colonnes → 1 colonne */
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+
+    /* Touch-friendly */
+    .form-input { padding: 0.75rem 1rem; font-size: 1rem; }
+    .btn-primary { padding: 0.875rem; font-size: 1rem; }
+
+    /* Footer non absolu */
+    .legal-footer { position: relative; bottom: auto; padding: 1.5rem 0 0.5rem; }
+
+    /* Bouton dark mode en bas */
+    .theme-toggle { top: auto; bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
+}
+
+/* === TRÈS PETIT MOBILE (max 480px) === */
+@media (max-width: 480px) {
+    .left-panel { padding: 0.875rem 1rem; }
+    .panel-logo { width: 72px; height: 44px; }
+    .right-panel { padding: 1.25rem 1rem 3rem; }
+    .form-title { font-size: 1.35rem; }
+
+    /* Cartes rôle en ligne horizontale sur mobile */
+    .role-cards-row { gap: 0.35rem; }
+    .role-card-small { padding: 0.5rem 0.3rem; }
+    .role-card-small strong { font-size: 0.72rem; }
+    .role-card-small small { display: none; }
 }

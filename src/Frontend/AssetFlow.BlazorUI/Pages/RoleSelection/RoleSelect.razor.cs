@@ -6,7 +6,7 @@
 
 using Microsoft.AspNetCore.Components;
 
-namespace AssetFlow.BlazorUI.Pages.Auth
+namespace AssetFlow.BlazorUI.Pages.RoleSelection
 {
     public partial class RoleSelect
     {
@@ -32,6 +32,7 @@ namespace AssetFlow.BlazorUI.Pages.Auth
         private void CheckAdminMode(ChangeEventArgs e)
         {
             AdminInput = e.Value?.ToString() ?? string.Empty;
+            Console.WriteLine($"Admin input: {AdminInput}"); // Debug
 
             if (AdminInput.ToLower() == "admin")
             {
