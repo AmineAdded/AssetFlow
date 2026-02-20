@@ -27,21 +27,22 @@
         <nav class="sidebar-nav">
             <a href="/employe/equipements" class="nav-link active">
                 <svg class="nav-icon" viewBox="0 0 24 24">
-                    <rect x="2" y="3" width="20" height="14" rx="2"/>
-                    <path d="M8 21h8M12 17v4"/>
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
                 </svg>
                 <span class="nav-text">Mes Équipements</span>
             </a>
             <a href="/employe/incident" class="nav-link">
                 <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3ZM12 9v4M12 17h.01"/>
+                    <path
+                    d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3ZM12 9v4M12 17h.01" />
                 </svg>
                 <span class="nav-text">Signaler un Incident</span>
             </a>
             <a href="/employe/profil" class="nav-link">
                 <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
                 </svg>
                 <span class="nav-text">Mon Profil</span>
             </a>
@@ -72,11 +73,13 @@
         <header class="detail-header">
             <nav class="breadcrumb">
                 <a href="/employe/equipements" class="breadcrumb-back" title="Retour">
-                    <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="15,18 9,12 15,6" />
+                    </svg>
                 </a>
                 <span class="breadcrumb-sep">Équipements</span>
                 <svg class="breadcrumb-chevron" viewBox="0 0 24 24">
-                    <polyline points="9,18 15,12 9,6"/>
+                    <polyline points="9,18 15,12 9,6" />
                 </svg>
                 <span class="breadcrumb-current">@(Equipement?.Designation ?? "Chargement...")</span>
             </nav>
@@ -96,8 +99,8 @@
             {
                 <div class="state-center">
                     <svg class="state-icon" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="m15 9-6 6M9 9l6 6"/>
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="m15 9-6 6M9 9l6 6" />
                     </svg>
                     <p>Équipement introuvable ou non autorisé.</p>
                     <a href="/employe/equipements" class="btn-back-link">← Retour</a>
@@ -127,14 +130,14 @@
                         <div class="equip-photo-box">
                             @if (!string.IsNullOrEmpty(Equipement.ImageUrl))
                             {
-                                <img class="equip-photo" src="@Equipement.ImageUrl" alt="@Equipement.Designation"/>
+                                <img class="equip-photo" src="@Equipement.ImageUrl" alt="@Equipement.Designation" />
                             }
                             else
                             {
                                 <div class="photo-placeholder">
                                     <svg viewBox="0 0 24 24">
-                                        <rect x="2" y="3" width="20" height="14" rx="2"/>
-                                        <path d="M8 21h8M12 17v4"/>
+                                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                                        <path d="M8 21h8M12 17v4" />
                                     </svg>
                                     <span>Aucune photo disponible</span>
                                 </div>
@@ -145,9 +148,9 @@
                         <div class="specs-card">
                             <div class="specs-header">
                                 <svg viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="8" x2="12" y2="12"/>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
                                 </svg>
                                 <h3>Spécifications Techniques</h3>
                             </div>
@@ -216,16 +219,16 @@
                             </p>
                             <div class="qr-url-row">
                                 <svg viewBox="0 0 24 24">
-                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                                 </svg>
                                 <code>@FicheUrl</code>
                             </div>
                             <button class="qr-btn-print" @onclick="ImprimerQR">
                                 <svg viewBox="0 0 24 24">
-                                    <polyline points="6,9 6,2 18,2 18,9"/>
-                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                                    <rect x="6" y="14" width="12" height="8"/>
+                                    <polyline points="6,9 6,2 18,2 18,9" />
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                    <rect x="6" y="14" width="12" height="8" />
                                 </svg>
                                 Imprimer / Télécharger QR
                             </button>
@@ -236,9 +239,10 @@
                             <div class="incident-top">
                                 <div class="incident-icon-box">
                                     <svg viewBox="0 0 24 24">
-                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                                        <line x1="12" y1="9" x2="12" y2="13"/>
-                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                        <path
+                                        d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                                        <line x1="12" y1="9" x2="12" y2="13" />
+                                        <line x1="12" y1="17" x2="12.01" y2="17" />
                                     </svg>
                                 </div>
                                 <div>
@@ -249,51 +253,13 @@
                                 </div>
                             </div>
 
-                            @if (IncidentEnvoye)
-                            {
-                                <div class="incident-ok">
-                                    <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
-                                    Incident déclaré. L'équipe IT a été notifiée.
-                                </div>
-                            }
-                            else if (ShowForm)
-                            {
-                                @* Chips de type *@
-                                <div class="type-chips">
-                                    @foreach (var t in new[] { "Panne", "Perte", "Dommage physique", "Autre" })
-                                    {
-                                        <button class="chip @(IncidentType == t ? "chip-on" : "")"
-                                                @onclick="() => IncidentType = t">@t</button>
-                                    }
-                                </div>
-
-                                <textarea class="incident-textarea"
-                                          rows="3"
-                                          placeholder="Décrivez le problème en détail..."
-                                          @bind="IncidentDescription"></textarea>
-
-                                @if (!string.IsNullOrEmpty(ErreurForm))
-                                {
-                                    <p class="incident-erreur">@ErreurForm</p>
-                                }
-
-                                <div class="form-btns">
-                                    <button class="btn-annuler" @onclick="Annuler">Annuler</button>
-                                    <button class="btn-confirmer" @onclick="Soumettre"
-                                            disabled="@EnCours">
-                                        @(EnCours ? "Envoi..." : "Confirmer")
-                                    </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <button class="btn-incident" @onclick="() => ShowForm = true">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                                    </svg>
-                                    Déclarer un incident
-                                </button>
-                            }
+                            @* Bouton qui redirige vers la page de signalement *@
+                            <button class="btn-incident" @onclick="NaviguerVersSignalement">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                                </svg>
+                                Déclarer un incident
+                            </button>
                         </div>
 
                     </aside>

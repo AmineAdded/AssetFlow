@@ -51,29 +51,6 @@ namespace AssetFlow.WebAPI.Controllers
 
             return Ok(equipement);
         }
-
-        /// <summary>
-        /// POST api/employe/incident
-        /// Signale un incident sur un équipement affecté
-        /// </summary>
-        [HttpPost("incident")]
-        public async Task<IActionResult> SignalerIncident([FromBody] SignalerIncidentDto request)
-        {
-            if (request.AffectationId <= 0)
-                return BadRequest("ID affectation invalide.");
-
-            if (string.IsNullOrWhiteSpace(request.TypeIncident))
-                return BadRequest("Type d'incident requis.");
-
-            if (string.IsNullOrWhiteSpace(request.Description))
-                return BadRequest("Description de l'incident requise.");
-
-            var result = await _employeService.SignalerIncidentAsync(request);
-
-            if (!result.Success)
-                return BadRequest(result.Message);
-
-            return Ok(result);
-        }
+  
     }
 }

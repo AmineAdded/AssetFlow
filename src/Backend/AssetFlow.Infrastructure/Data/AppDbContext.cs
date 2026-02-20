@@ -1,7 +1,6 @@
 // ============================================================
 // AssetFlow.Infrastructure / Data / AppDbContext.cs
-// Contexte Entity Framework Core - VERSION MISE À JOUR
-// Ajout des tables Materiels et Affectations
+// MISE À JOUR : Ajout de la table Incidents
 // ============================================================
 
 using AssetFlow.Domain.Entities;
@@ -17,6 +16,7 @@ namespace AssetFlow.Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Materiel> Materiels { get; set; }
         public DbSet<Affectation> Affectations { get; set; }
+        public DbSet<Incident> Incidents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,15 +52,33 @@ namespace AssetFlow.Infrastructure.Data
                 entity.Property(a => a.Statut).HasConversion<string>().HasMaxLength(50);
 
                 // Relation Affectation -> Materiel (1-N)
+                // un matériel a plusieurs affectations, mais une affectation concerne un seul matériel
                 entity.HasOne(a => a.Materiel)
                       .WithMany(m => m.Affectations)
                       .HasForeignKey(a => a.MaterielId)
-                      .OnDelete(DeleteBehavior.Restrict); // Empêche suppression matériel si affectation existe
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 // Relation Affectation -> User (1-N)
                 entity.HasOne(a => a.Utilisateur)
                       .WithMany()
                       .HasForeignKey(a => a.UtilisateurId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // === CONFIGURATION INCIDENT ===
+            modelBuilder.Entity<Incident>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+                entity.Property(i => i.TypeIncident).IsRequired().HasMaxLength(50);
+                entity.Property(i => i.Description).IsRequired().HasMaxLength(1000);
+                entity.Property(i => i.Statut).HasConversion<string>().HasMaxLength(50);
+                entity.Property(i => i.CommentairesResolution).HasMaxLength(1000);
+
+                // Relation Incident -> Affectation (N-1)
+                // une affectation a plusieurs incidents, mais un incident concerne une seule affectation
+                entity.HasOne(i => i.Affectation)
+                      .WithMany()
+                      .HasForeignKey(i => i.AffectationId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }

@@ -76,46 +76,6 @@ namespace AssetFlow.Infrastructure.Services
         }
 
         /// <summary>
-        /// Signale un incident sur un équipement
-        /// NOTE: Pour l'instant, on met à jour juste les observations
-        /// Dans une version complète, créer une table Incidents séparée
-        /// </summary>
-        public async Task<SignalerIncidentResponseDto> SignalerIncidentAsync(SignalerIncidentDto request)
-        {
-            var affectation = await _context.Affectations.FindAsync(request.AffectationId);
-
-            if (affectation == null)
-            {
-                return new SignalerIncidentResponseDto
-                {
-                    Success = false,
-                    Message = "Affectation introuvable."
-                };
-            }
-
-            // Mettre à jour les observations avec l'incident
-            var incidentLog = $"[{request.DateIncident:dd/MM/yyyy HH:mm}] {request.TypeIncident}: {request.Description}";
-            affectation.Observations = string.IsNullOrEmpty(affectation.Observations)
-                ? incidentLog
-                : $"{affectation.Observations}\n{incidentLog}";
-
-            // Si incident = Perte ou Dommage, changer le statut
-            if (request.TypeIncident.ToLower().Contains("perte"))
-                affectation.Statut = StatutAffectation.Perdu;
-            else if (request.TypeIncident.ToLower().Contains("dommage") || request.TypeIncident.ToLower().Contains("panne"))
-                affectation.Statut = StatutAffectation.Endommage;
-
-            await _context.SaveChangesAsync();
-
-            return new SignalerIncidentResponseDto
-            {
-                Success = true,
-                Message = "Incident signalé avec succès. L'équipe IT a été notifiée.",
-                IncidentId = affectation.Id
-            };
-        }
-
-        /// <summary>
         /// Détermine la couleur du badge selon le statut
         /// </summary>
         private string GetStatutColor(StatutAffectation statut)

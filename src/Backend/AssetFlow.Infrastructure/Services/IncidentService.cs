@@ -1,0 +1,170 @@
+// ============================================================
+// AssetFlow.Infrastructure / Services / IncidentService.cs
+// Implémentation du service de gestion des incidents
+// ============================================================
+
+using AssetFlow.Application.DTOs;
+using AssetFlow.Application.Interfaces;
+using AssetFlow.Domain.Entities;
+using AssetFlow.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace AssetFlow.Infrastructure.Services
+{
+    public class IncidentService : IIncidentService
+    {
+        private readonly AppDbContext _context;
+
+        public IncidentService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        /// <summary>
+        /// Signale un nouvel incident
+        /// </summary>
+        public async Task<SignalerIncidentResponseDto> SignalerIncidentAsync(SignalerIncidentRequestDto request)
+        {
+            try
+            {
+                // Vérifier que l'affectation existe
+                var affectation = await _context.Affectations
+                    .Include(a => a.Materiel)
+                    .FirstOrDefaultAsync(a => a.Id == request.AffectationId);
+
+                if (affectation == null)
+                {
+                    return new SignalerIncidentResponseDto
+                    {
+                        Success = false,
+                        Message = "Affectation introuvable."
+                    };
+                }
+
+                // Créer l'incident
+                var incident = new Incident
+                {
+                    AffectationId = request.AffectationId,
+                    TypeIncident = request.TypeIncident,
+                    Urgence = request.Urgence,
+                    Description = request.Description,
+                    DateIncident = DateTime.UtcNow,
+                    Statut = StatutIncident.EnAttente
+                };
+
+                _context.Incidents.Add(incident);
+                await _context.SaveChangesAsync();
+
+                // Générer le numéro d'incident (format: INC-YYYY-XXX)
+                var numeroIncident = $"INC-{DateTime.UtcNow.Year}-{incident.Id:D3}";
+
+                // Mettre à jour le statut de l'affectation si nécessaire
+                if (request.TypeIncident.ToLower().Contains("vol") || 
+                    request.TypeIncident.ToLower().Contains("perte"))
+                {
+                    affectation.Statut = StatutAffectation.Perdu;
+                }
+                else if (request.TypeIncident.ToLower().Contains("casse") || 
+                         request.TypeIncident.ToLower().Contains("panne"))
+                {
+                    affectation.Statut = StatutAffectation.Endommage;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return new SignalerIncidentResponseDto
+                {
+                    Success = true,
+                    Message = "Incident signalé avec succès. L'équipe IT a été notifiée.",
+                    IncidentId = incident.Id,
+                    NumeroIncident = numeroIncident
+                };
+            }
+            catch (Exception ex)
+            {
+                return new SignalerIncidentResponseDto
+                {
+                    Success = false,
+                    Message = $"Erreur lors du signalement : {ex.Message}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// Récupère tous les incidents d'un utilisateur
+        /// </summary>
+        public async Task<List<IncidentDto>> GetIncidentsUtilisateurAsync(int utilisateurId)
+        {
+            var incidents = await _context.Incidents
+                .Include(i => i.Affectation)
+                .ThenInclude(a => a.Materiel)
+                .Where(i => i.Affectation.UtilisateurId == utilisateurId)
+                .OrderByDescending(i => i.DateIncident)
+                .ToListAsync();
+
+            return incidents.Select(i => MapToDto(i)).ToList();
+        }
+
+        /// <summary>
+        /// Récupère le détail d'un incident
+        /// </summary>
+        public async Task<IncidentDto?> GetIncidentDetailAsync(int incidentId)
+        {
+            var incident = await _context.Incidents
+                .Include(i => i.Affectation)
+                .ThenInclude(a => a.Materiel)
+                .FirstOrDefaultAsync(i => i.Id == incidentId);
+
+            return incident == null ? null : MapToDto(incident);
+        }
+
+        /// <summary>
+        /// Mapper Incident -> IncidentDto
+        /// </summary>
+        private IncidentDto MapToDto(Incident incident)
+        {
+            return new IncidentDto
+            {
+                Id = incident.Id,
+                AffectationId = incident.AffectationId,
+                NumeroIncident = $"INC-{incident.DateIncident.Year}-{incident.Id:D3}",
+                TypeIncident = incident.TypeIncident,
+                Urgence = incident.Urgence,
+                UrgenceLabel = GetUrgenceLabel(incident.Urgence),
+                Description = incident.Description,
+                DateIncident = incident.DateIncident,
+                Statut = incident.Statut.ToString(),
+                StatutLabel = GetStatutLabel(incident.Statut),
+                DateResolution = incident.DateResolution,
+                CommentairesResolution = incident.CommentairesResolution,
+                MaterielDesignation = incident.Affectation.Materiel.Designation,
+                MaterielReference = incident.Affectation.Materiel.Reference
+            };
+        }
+
+        /// <summary>
+        /// Convertit le niveau d'urgence en label
+        /// </summary>
+        private string GetUrgenceLabel(int urgence)
+        {
+            if (urgence <= 33) return "Faible";
+            if (urgence <= 66) return "Moyen";
+            return "Critique";
+        }
+
+        /// <summary>
+        /// Convertit le statut en label français
+        /// </summary>
+        private string GetStatutLabel(StatutIncident statut)
+        {
+            return statut switch
+            {
+                StatutIncident.EnAttente => "En attente",
+                StatutIncident.EnCours => "En cours",
+                StatutIncident.Resolu => "Résolu",
+                StatutIncident.Cloture => "Clôturé",
+                _ => statut.ToString()
+            };
+        }
+    }
+}

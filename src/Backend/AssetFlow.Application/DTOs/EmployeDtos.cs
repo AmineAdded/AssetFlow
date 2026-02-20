@@ -44,32 +44,4 @@ namespace AssetFlow.Application.DTOs
         /// <summary>Observations éventuelles</summary>
         public string? Observations { get; set; }
     }
-
-    /// <summary>
-    /// DTO pour signaler un incident sur un équipement
-    /// </summary>
-    public class SignalerIncidentDto
-    {
-        /// <summary>ID de l'affectation concernée</summary>
-        public int AffectationId { get; set; }
-
-        /// <summary>Type d'incident (Panne, Perte, Dommage, Autre)</summary>
-        public string TypeIncident { get; set; } = string.Empty;
-
-        /// <summary>Description de l'incident</summary>
-        public string Description { get; set; } = string.Empty;
-
-        /// <summary>Date de l'incident</summary>
-        public DateTime DateIncident { get; set; } = DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Réponse après signalement d'incident
-    /// </summary>
-    public class SignalerIncidentResponseDto
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public int? IncidentId { get; set; }
-    }
 }

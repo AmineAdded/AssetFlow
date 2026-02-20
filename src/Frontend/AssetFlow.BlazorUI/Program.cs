@@ -25,5 +25,6 @@ builder.Services.AddBlazoredLocalStorage();
 // === SERVICES ===
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EmployeService>();  // ← NOUVEAU
+builder.Services.AddScoped<IncidentService>();
 
 await builder.Build().RunAsync();

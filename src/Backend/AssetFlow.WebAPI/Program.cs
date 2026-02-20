@@ -36,6 +36,7 @@ builder.Services.AddAuthorization();
 // === INJECTION DES SERVICES ===
 builder.Services.AddHttpClient<IAuthService, KeycloakAuthService>();
 builder.Services.AddScoped<IEmployeService, EmployeService>(); // ← NOUVEAU
+builder.Services.AddScoped<IIncidentService, IncidentService>(); 
 
 // === CORS ===
 builder.Services.AddCors(options =>

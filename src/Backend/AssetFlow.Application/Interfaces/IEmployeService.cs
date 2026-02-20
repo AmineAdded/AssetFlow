@@ -26,12 +26,5 @@ namespace AssetFlow.Application.Interfaces
         /// <param name="affectationId">ID de l'affectation</param>
         /// <returns>Détail de l'équipement affecté</returns>
         Task<EquipementAffecteDto?> GetEquipementDetailAsync(int affectationId);
-
-        /// <summary>
-        /// Permet à l'employé de signaler un incident sur un équipement
-        /// </summary>
-        /// <param name="request">Données de l'incident</param>
-        /// <returns>Confirmation du signalement</returns>
-        Task<SignalerIncidentResponseDto> SignalerIncidentAsync(SignalerIncidentDto request);
     }
 }
