@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.BlazorUI / Services / IncidentService.cs
-// Service frontend pour la gestion des incidents
+// MISE À JOUR : Ajout de GetIncidentsByAffectationAsync
 // ============================================================
 
 using System.Net.Http.Json;
@@ -109,9 +109,7 @@ namespace AssetFlow.BlazorUI.Services
             {
                 var userId = await _localStorage.GetItemAsync<int?>("user_id");
                 if (userId == null)
-                {
                     return new List<IncidentDto>();
-                }
 
                 var response = await _httpClient.GetAsync($"api/incident/utilisateur/{userId}");
 
@@ -119,6 +117,43 @@ namespace AssetFlow.BlazorUI.Services
                 {
                     var incidents = await response.Content.ReadFromJsonAsync<List<IncidentDto>>();
                     return incidents ?? new List<IncidentDto>();
+                }
+
+                return new List<IncidentDto>();
+            }
+            catch
+            {
+                return new List<IncidentDto>();
+            }
+        }
+
+        /// <summary>
+        /// Récupère tous les incidents liés à une affectation spécifique
+        /// NOUVEAU : utilisé dans DetailsEquipement pour afficher l'historique des incidents
+        /// </summary>
+        public async Task<List<IncidentDto>> GetIncidentsByAffectationAsync(int affectationId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/incident/affectation/{affectationId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var incidents = await response.Content.ReadFromJsonAsync<List<IncidentDto>>();
+                    return incidents ?? new List<IncidentDto>();
+                }
+
+                // Fallback : récupérer tous les incidents de l'utilisateur et filtrer
+                var userId = await _localStorage.GetItemAsync<int?>("user_id");
+                if (userId == null)
+                    return new List<IncidentDto>();
+
+                var allResponse = await _httpClient.GetAsync($"api/incident/utilisateur/{userId}");
+                if (allResponse.IsSuccessStatusCode)
+                {
+                    var all = await allResponse.Content.ReadFromJsonAsync<List<IncidentDto>>();
+                    return all?.Where(i => i.AffectationId == affectationId).ToList()
+                           ?? new List<IncidentDto>();
                 }
 
                 return new List<IncidentDto>();
@@ -139,9 +174,7 @@ namespace AssetFlow.BlazorUI.Services
                 var response = await _httpClient.GetAsync($"api/incident/{incidentId}");
 
                 if (response.IsSuccessStatusCode)
-                {
                     return await response.Content.ReadFromJsonAsync<IncidentDto>();
-                }
 
                 return null;
             }

@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.Application / Interfaces / IIncidentService.cs
-// Interface du service Incident (contrat)
+// MISE À JOUR : Ajout GetIncidentsByAffectationAsync
 // ============================================================
 
 using AssetFlow.Application.DTOs;
@@ -21,6 +21,12 @@ namespace AssetFlow.Application.Interfaces
         /// Récupère tous les incidents d'un utilisateur
         /// </summary>
         Task<List<IncidentDto>> GetIncidentsUtilisateurAsync(int utilisateurId);
+
+        /// <summary>
+        /// Récupère tous les incidents liés à une affectation
+        /// NOUVEAU : utilisé dans la page DetailsEquipement
+        /// </summary>
+        Task<List<IncidentDto>> GetIncidentsByAffectationAsync(int affectationId);
 
         /// <summary>
         /// Récupère le détail d'un incident

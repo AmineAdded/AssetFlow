@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.WebAPI / Controllers / IncidentController.cs
-// Contrôleur API pour la gestion des incidents
+// MISE À JOUR : Ajout endpoint GET api/incident/affectation/{affectationId}
 // ============================================================
 
 using AssetFlow.Application.DTOs;
@@ -55,6 +55,20 @@ namespace AssetFlow.WebAPI.Controllers
                 return BadRequest("ID utilisateur invalide.");
 
             var incidents = await _incidentService.GetIncidentsUtilisateurAsync(utilisateurId);
+            return Ok(incidents);
+        }
+
+        /// <summary>
+        /// GET api/incident/affectation/{affectationId}
+        /// NOUVEAU : Récupère tous les incidents liés à une affectation
+        /// </summary>
+        [HttpGet("affectation/{affectationId}")]
+        public async Task<IActionResult> GetIncidentsByAffectation(int affectationId)
+        {
+            if (affectationId <= 0)
+                return BadRequest("ID affectation invalide.");
+
+            var incidents = await _incidentService.GetIncidentsByAffectationAsync(affectationId);
             return Ok(incidents);
         }
 

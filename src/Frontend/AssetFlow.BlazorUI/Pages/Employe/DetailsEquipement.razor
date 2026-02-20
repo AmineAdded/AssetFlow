@@ -1,22 +1,15 @@
 @* ============================================================
    Pages/Employe/DetailsEquipement.razor
-   
-   Page détail d'un équipement — vue Employé.
-   
-   QR CODE :
-   - Généré en SVG pur sans lib externe
-   - Encode l'URL /fiche/{affectationId}
-   - Cette URL est une page Blazor publique (pas de @attribute [Authorize])
-   - Scannable depuis n'importe quel téléphone sans app
+   MISE À JOUR : Ajout de la liste des incidents sous les spécifications
    ============================================================ *@
-
+@namespace AssetFlow.BlazorUI.Pages.Employe
 @page "/employe/equipement/{AffectationId:int}"
 @using AssetFlow.BlazorUI.Services
 
 <div class="employe-layout">
 
     @* ══════════════════════════════════════════════════════
-       SIDEBAR — copiée à l'identique depuis MesEquipements
+       SIDEBAR
     ══════════════════════════════════════════════════════ *@
     <aside class="employe-sidebar">
 
@@ -34,8 +27,7 @@
             </a>
             <a href="/employe/incident" class="nav-link">
                 <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path
-                    d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3ZM12 9v4M12 17h.01" />
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3ZM12 9v4M12 17h.01" />
                 </svg>
                 <span class="nav-text">Signaler un Incident</span>
             </a>
@@ -69,7 +61,6 @@
     ══════════════════════════════════════════════════════ *@
     <main class="detail-main">
 
-        @* Header — fil d'Ariane seulement, pas de boutons à droite *@
         <header class="detail-header">
             <nav class="breadcrumb">
                 <a href="/employe/equipements" class="breadcrumb-back" title="Retour">
@@ -85,7 +76,6 @@
             </nav>
         </header>
 
-        @* Zone scrollable *@
         <div class="detail-content">
 
             @if (IsLoading)
@@ -197,6 +187,108 @@
                             </table>
                         </div>
 
+                        @* ══════════════════════════════════════════════
+                           SECTION HISTORIQUE DES INCIDENTS
+                        ══════════════════════════════════════════════ *@
+                        <div class="incidents-section">
+                            <div class="incidents-section-header">
+                                <div class="incidents-title-group">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" />
+                                        <path d="M12 8v4l3 3" />
+                                    </svg>
+                                    <h3>Historique des incidents</h3>
+                                </div>
+                                @if (Incidents.Count > 0)
+                                {
+                                    <span class="incidents-count-badge">@Incidents.Count</span>
+                                }
+                            </div>
+
+                            @if (IsLoadingIncidents)
+                            {
+                                <div class="incidents-loading">
+                                    <div class="spinner-sm"></div>
+                                    <span>Chargement des incidents...</span>
+                                </div>
+                            }
+                            else if (Incidents.Count == 0)
+                            {
+                                <div class="incidents-empty">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                    </svg>
+                                    <p>Aucun incident signalé pour cet équipement.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="incidents-timeline">
+                                    @foreach (var incident in Incidents)
+                                    {
+                                        <div class="timeline-item">
+                                            @* Icône colorée selon le statut *@
+                                            <div class="timeline-dot dot-@GetIncidentDotClass(incident.Statut)">
+                                                <svg viewBox="0 0 24 24">
+                                                    @if (incident.Statut == "Resolu" || incident.Statut == "Cloture")
+                                                    {
+                                                        <polyline points="20 6 9 17 4 12" />
+                                                    }
+                                                    else if (incident.Statut == "EnCours")
+                                                    {
+                                                        <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" />
+                                                        <path d="M12 7v5l3 3" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                                                        <path d="M12 9v4M12 17h.01" />
+                                                    }
+                                                </svg>
+                                            </div>
+
+                                            @* Contenu de l'incident *@
+                                            <div class="timeline-content">
+                                                <div class="timeline-top-row">
+                                                    <div class="timeline-badges">
+                                                        <span class="incident-type-badge type-@incident.TypeIncident.ToLower()">
+                                                            @incident.TypeIncident
+                                                        </span>
+                                                        <span class="incident-statut-badge statut-badge-@incident.Statut.ToLower()">
+                                                            @incident.StatutLabel
+                                                        </span>
+                                                        <span class="incident-urgence-badge urgence-@GetUrgenceClass(incident.Urgence)">
+                                                            @incident.UrgenceLabel
+                                                        </span>
+                                                    </div>
+                                                    <div class="timeline-meta">
+                                                        <span class="timeline-numero">@incident.NumeroIncident</span>
+                                                        <span class="timeline-date">
+                                                            @incident.DateIncident.ToString("dd MMM yyyy")
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <p class="timeline-description">@incident.Description</p>
+
+                                                @if (incident.DateResolution.HasValue && !string.IsNullOrEmpty(incident.CommentairesResolution))
+                                                {
+                                                    <div class="timeline-resolution">
+                                                        <svg viewBox="0 0 24 24">
+                                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                            <polyline points="22 4 12 14.01 9 11.01" />
+                                                        </svg>
+                                                        <span>@incident.CommentairesResolution</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
                     </section>
 
                     @* ════ COLONNE DROITE (40%) ════ *@
@@ -205,9 +297,6 @@
                         @* ── QR Code ── *@
                         <div class="qr-card">
                             <div class="qr-frame">
-                                @* SVG QR généré en pur C# — encode FicheUrl
-                                   Quand scanné → ouvre /fiche/{AffectationId} sur mobile
-                                   Page publique (sans auth), optimisée téléphone *@
                                 <div class="qr-svg-wrap">
                                     @((MarkupString)QrSvg)
                                 </div>
@@ -239,8 +328,7 @@
                             <div class="incident-top">
                                 <div class="incident-icon-box">
                                     <svg viewBox="0 0 24 24">
-                                        <path
-                                        d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                                         <line x1="12" y1="9" x2="12" y2="13" />
                                         <line x1="12" y1="17" x2="12.01" y2="17" />
                                     </svg>
@@ -253,7 +341,6 @@
                                 </div>
                             </div>
 
-                            @* Bouton qui redirige vers la page de signalement *@
                             <button class="btn-incident" @onclick="NaviguerVersSignalement">
                                 <svg viewBox="0 0 24 24">
                                     <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />

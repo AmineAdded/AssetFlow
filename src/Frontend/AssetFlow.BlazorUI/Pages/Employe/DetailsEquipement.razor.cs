@@ -1,7 +1,6 @@
 // ============================================================
 // Pages/Employe/DetailsEquipement.razor.cs
-// MISE À JOUR : Suppression du formulaire inline
-// Navigation vers /employe/incident/{id}
+// MISE À JOUR : Chargement des incidents de l'affectation
 // ============================================================
 
 using AssetFlow.BlazorUI.Services;
@@ -14,16 +13,21 @@ namespace AssetFlow.BlazorUI.Pages.Employe
     public partial class DetailsEquipement
     {
         // ── Injections ─────────────────────────────────────────
-        [Inject] private EmployeService EmployeService { get; set; } = default!;
+        [Inject] private EmployeService  EmployeService  { get; set; } = default!;
+        [Inject] private IncidentService IncidentService { get; set; } = default!;
         [Inject] private NavigationManager Navigation    { get; set; } = default!;
         [Inject] private IJSRuntime JS                   { get; set; } = default!;
 
-        // ── Paramètre URL : /employe/equipement/{AffectationId} ──
+        // ── Paramètre URL ──────────────────────────────────────
         [Parameter] public int AffectationId { get; set; }
 
-        // ── Données ────────────────────────────────────────────
-        private EquipementAffecteDto? Equipement { get; set; }
-        private bool IsLoading { get; set; } = true;
+        // ── Données équipement ─────────────────────────────────
+        private EquipementAffecteDto? Equipement    { get; set; }
+        private bool                  IsLoading     { get; set; } = true;
+
+        // ── Données incidents ──────────────────────────────────
+        private List<IncidentDto> Incidents          { get; set; } = new();
+        private bool              IsLoadingIncidents { get; set; } = true;
 
         // ── Infos utilisateur ──────────────────────────────────
         private string UserName { get; set; } = "Utilisateur";
@@ -38,7 +42,12 @@ namespace AssetFlow.BlazorUI.Pages.Employe
         {
             UserName = await EmployeService.GetCurrentUserNameAsync();
             UserRole = await EmployeService.GetCurrentUserRoleAsync();
-            await ChargerEquipement();
+
+            // Charger équipement et incidents en parallèle
+            await Task.WhenAll(
+                ChargerEquipement(),
+                ChargerIncidents()
+            );
         }
 
         protected override void OnParametersSet()
@@ -46,7 +55,7 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             QrSvg = BuildQrSvg(FicheUrl);
         }
 
-        // ── Chargement ─────────────────────────────────────────
+        // ── Chargement équipement ──────────────────────────────
         private async Task ChargerEquipement()
         {
             IsLoading = true;
@@ -64,13 +73,68 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             }
         }
 
-        // ── Navigation vers Signalement ────────────────────────
-        /// <summary>
-        /// Redirige vers la page de signalement d'incident
-        /// </summary>
+        // ── Chargement incidents ───────────────────────────────
+        private async Task ChargerIncidents()
+        {
+            IsLoadingIncidents = true;
+            try
+            {
+                Incidents = await IncidentService.GetIncidentsByAffectationAsync(AffectationId);
+            }
+            catch
+            {
+                Incidents = new List<IncidentDto>();
+            }
+            finally
+            {
+                IsLoadingIncidents = false;
+            }
+        }
+
+        // ── Navigation ─────────────────────────────────────────
         private void NaviguerVersSignalement()
         {
             Navigation.NavigateTo($"/employe/incident/{AffectationId}");
+        }
+
+        // ── Helpers UI ─────────────────────────────────────────
+        private string GetInitials()
+        {
+            var parts = UserName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2) return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+            if (parts.Length == 1 && parts[0].Length >= 2) return parts[0][..2].ToUpper();
+            return "??";
+        }
+
+        private string GetStatutLabel(string statut) => statut switch
+        {
+            "EnCours"   => "En Service",
+            "Retourne"  => "Retourné",
+            "Perdu"     => "Perdu",
+            "Endommage" => "Endommagé",
+            _           => statut
+        };
+
+        /// <summary>
+        /// Couleur du point de la timeline selon le statut de l'incident
+        /// </summary>
+        private string GetIncidentDotClass(string statut) => statut switch
+        {
+            "Resolu"   => "resolu",
+            "Cloture"  => "cloture",
+            "EnCours"  => "encours",
+            "EnAttente"=> "attente",
+            _          => "attente"
+        };
+
+        /// <summary>
+        /// Classe CSS pour le badge d'urgence
+        /// </summary>
+        private string GetUrgenceClass(int urgence)
+        {
+            if (urgence <= 33) return "faible";
+            if (urgence <= 66) return "moyen";
+            return "critique";
         }
 
         // ── Impression QR ──────────────────────────────────────
@@ -115,24 +179,6 @@ namespace AssetFlow.BlazorUI.Pages.Employe
                 w.document.close();
             ");
         }
-
-        // ── Helpers ────────────────────────────────────────────
-        private string GetInitials()
-        {
-            var parts = UserName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length >= 2) return $"{parts[0][0]}{parts[1][0]}".ToUpper();
-            if (parts.Length == 1 && parts[0].Length >= 2) return parts[0][..2].ToUpper();
-            return "??";
-        }
-
-        private string GetStatutLabel(string statut) => statut switch
-        {
-            "EnCours"   => "En Service",
-            "Retourne"  => "Retourné",
-            "Perdu"     => "Perdu",
-            "Endommage" => "Endommagé",
-            _           => statut
-        };
 
         // ── Génération QR Code SVG ─────────────────────────────
         private string BuildQrSvg(string url)
@@ -179,13 +225,9 @@ namespace AssetFlow.BlazorUI.Pages.Employe
                         int c = col - cx;
                         if (c < 0 || grid[row, c]) continue;
                         if (bitIndex < bits.Count)
-                        {
                             grid[row, c] = bits[bitIndex++];
-                        }
                         else
-                        {
                             grid[row, c] = (row + c) % 2 == 0;
-                        }
                     }
                 }
                 goingUp = !goingUp;

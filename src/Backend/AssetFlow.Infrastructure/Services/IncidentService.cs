@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.Infrastructure / Services / IncidentService.cs
-// Implémentation du service de gestion des incidents
+// MISE À JOUR : Ajout GetIncidentsByAffectationAsync
 // ============================================================
 
 using AssetFlow.Application.DTOs;
@@ -27,21 +27,13 @@ namespace AssetFlow.Infrastructure.Services
         {
             try
             {
-                // Vérifier que l'affectation existe
                 var affectation = await _context.Affectations
                     .Include(a => a.Materiel)
                     .FirstOrDefaultAsync(a => a.Id == request.AffectationId);
 
                 if (affectation == null)
-                {
-                    return new SignalerIncidentResponseDto
-                    {
-                        Success = false,
-                        Message = "Affectation introuvable."
-                    };
-                }
+                    return new SignalerIncidentResponseDto { Success = false, Message = "Affectation introuvable." };
 
-                // Créer l'incident
                 var incident = new Incident
                 {
                     AffectationId = request.AffectationId,
@@ -55,20 +47,14 @@ namespace AssetFlow.Infrastructure.Services
                 _context.Incidents.Add(incident);
                 await _context.SaveChangesAsync();
 
-                // Générer le numéro d'incident (format: INC-YYYY-XXX)
                 var numeroIncident = $"INC-{DateTime.UtcNow.Year}-{incident.Id:D3}";
 
-                // Mettre à jour le statut de l'affectation si nécessaire
-                if (request.TypeIncident.ToLower().Contains("vol") || 
+                if (request.TypeIncident.ToLower().Contains("vol") ||
                     request.TypeIncident.ToLower().Contains("perte"))
-                {
                     affectation.Statut = StatutAffectation.Perdu;
-                }
-                else if (request.TypeIncident.ToLower().Contains("casse") || 
+                else if (request.TypeIncident.ToLower().Contains("casse") ||
                          request.TypeIncident.ToLower().Contains("panne"))
-                {
                     affectation.Statut = StatutAffectation.Endommage;
-                }
 
                 await _context.SaveChangesAsync();
 
@@ -102,7 +88,22 @@ namespace AssetFlow.Infrastructure.Services
                 .OrderByDescending(i => i.DateIncident)
                 .ToListAsync();
 
-            return incidents.Select(i => MapToDto(i)).ToList();
+            return incidents.Select(MapToDto).ToList();
+        }
+
+        /// <summary>
+        /// NOUVEAU : Récupère tous les incidents liés à une affectation
+        /// </summary>
+        public async Task<List<IncidentDto>> GetIncidentsByAffectationAsync(int affectationId)
+        {
+            var incidents = await _context.Incidents
+                .Include(i => i.Affectation)
+                .ThenInclude(a => a.Materiel)
+                .Where(i => i.AffectationId == affectationId)
+                .OrderByDescending(i => i.DateIncident)
+                .ToListAsync();
+
+            return incidents.Select(MapToDto).ToList();
         }
 
         /// <summary>
@@ -118,9 +119,6 @@ namespace AssetFlow.Infrastructure.Services
             return incident == null ? null : MapToDto(incident);
         }
 
-        /// <summary>
-        /// Mapper Incident -> IncidentDto
-        /// </summary>
         private IncidentDto MapToDto(Incident incident)
         {
             return new IncidentDto
@@ -142,9 +140,6 @@ namespace AssetFlow.Infrastructure.Services
             };
         }
 
-        /// <summary>
-        /// Convertit le niveau d'urgence en label
-        /// </summary>
         private string GetUrgenceLabel(int urgence)
         {
             if (urgence <= 33) return "Faible";
@@ -152,9 +147,6 @@ namespace AssetFlow.Infrastructure.Services
             return "Critique";
         }
 
-        /// <summary>
-        /// Convertit le statut en label français
-        /// </summary>
         private string GetStatutLabel(StatutIncident statut)
         {
             return statut switch
