@@ -100,7 +100,7 @@ namespace AssetFlow.BlazorUI.Pages.Auth
                 {
                     "IT" => "/dashboard/it",
                     "EquipeAchat" => "/dashboard/achat",
-                    "Employe" => "/dashboard/employe",
+                    "Employe" => "/employe/equipements",
                     "Admin" => "/dashboard/admin",
                     _ => "/dashboard"
                 };

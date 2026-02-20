@@ -1,6 +1,6 @@
 // ============================================================
-// AssetFlow.BlazorUI / Program.cs
-// Point d'entrée du frontend Blazor WebAssembly
+// AssetFlow.BlazorUI / Program.cs - MISE À JOUR
+// Ajout de EmployeService dans l'injection de dépendances
 // ============================================================
 
 using AssetFlow.BlazorUI;
@@ -13,23 +13,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// ==========================================
-// URL du backend API
-// En hors-ligne, tout tourne localement
-// ==========================================
+// === HTTP CLIENT ===
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5235/") // URL de l'API ASP.NET
+    BaseAddress = new Uri("http://localhost:5235/")
 });
 
-// ==========================================
-// LocalStorage pour stocker le token JWT
-// ==========================================
+// === LOCAL STORAGE ===
 builder.Services.AddBlazoredLocalStorage();
 
-// ==========================================
-// Enregistrement du service d'authentification
-// ==========================================
+// === SERVICES ===
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<EmployeService>();  // ← NOUVEAU
 
 await builder.Build().RunAsync();

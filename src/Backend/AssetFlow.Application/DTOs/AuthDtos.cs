@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.Application / DTOs / AuthDtos.cs
-// Objets de transfert de données pour l'authentification
+// MISE À JOUR : Ajout de UserId dans LoginResponseDto
 // ============================================================
 
 namespace AssetFlow.Application.DTOs
@@ -17,9 +17,11 @@ namespace AssetFlow.Application.DTOs
 
     /// <summary>
     /// Réponse retournée après une connexion réussie
+    /// AJOUT : UserId pour identifier l'utilisateur côté frontend
     /// </summary>
     public class LoginResponseDto
     {
+        public int UserId { get; set; }                    // ← NOUVEAU
         public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;
         public int ExpiresIn { get; set; }

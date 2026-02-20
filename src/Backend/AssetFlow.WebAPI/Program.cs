@@ -1,3 +1,8 @@
+// ============================================================
+// AssetFlow.WebAPI / Program.cs - VERSION MISE À JOUR
+// Ajout du service EmployeService dans l'injection de dépendances
+// ============================================================
+
 using AssetFlow.Application.Interfaces;
 using AssetFlow.Infrastructure.Data;
 using AssetFlow.Infrastructure.Services;
@@ -7,9 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// === BASE DE DONNÉES ===
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// === AUTHENTIFICATION JWT ===
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -25,8 +32,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddHttpClient<IAuthService, KeycloakAuthService>();
 
+// === INJECTION DES SERVICES ===
+builder.Services.AddHttpClient<IAuthService, KeycloakAuthService>();
+builder.Services.AddScoped<IEmployeService, EmployeService>(); // ← NOUVEAU
+
+// === CORS ===
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorPolicy", policy =>
@@ -35,7 +46,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // ← simple, sans configuration
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -50,6 +61,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// === MIGRATION AUTOMATIQUE AU DÉMARRAGE ===
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

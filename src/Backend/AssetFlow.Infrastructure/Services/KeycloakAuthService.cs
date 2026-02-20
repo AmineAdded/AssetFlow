@@ -1,7 +1,6 @@
 // ============================================================
 // AssetFlow.Infrastructure / Services / KeycloakAuthService.cs
-// Implémentation concrète du service d'auth avec Keycloak
-// Keycloak tourne en LOCAL (hors-ligne) sur http://localhost:8080
+// MISE À JOUR : Retourne UserId dans LoginResponseDto
 // ============================================================
 
 using System.Net.Http.Json;
@@ -22,8 +21,7 @@ namespace AssetFlow.Infrastructure.Services
         private readonly AppDbContext _dbContext;
         private readonly IConfiguration _config;
 
-        // On récupère l'URL Keycloak depuis appsettings.json
-        private string KeycloakUrl => _config["Keycloak:Authority"]!; // ex: http://localhost:8080/realms/assetflow
+        private string KeycloakUrl => _config["Keycloak:Authority"]!;
         private string ClientId => _config["Keycloak:ClientId"]!;
         private string ClientSecret => _config["Keycloak:ClientSecret"]!;
 
@@ -36,16 +34,15 @@ namespace AssetFlow.Infrastructure.Services
 
         /// <summary>
         /// Login : appelle Keycloak avec email+password, récupère le token JWT
+        /// AJOUT : Retourne aussi l'ID utilisateur depuis SQL Server
         /// </summary>
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
-            // URL du token Keycloak (endpoint standard OpenID Connect)
             var tokenUrl = $"{KeycloakUrl}/protocol/openid-connect/token";
 
-            // Données envoyées à Keycloak (format form-urlencoded)
             var formData = new Dictionary<string, string>
             {
-                { "grant_type", "password" },        // Mode: direct access grant
+                { "grant_type", "password" },
                 { "client_id", ClientId },
                 { "client_secret", ClientSecret },
                 { "username", request.Email },
@@ -53,33 +50,35 @@ namespace AssetFlow.Infrastructure.Services
                 { "scope", "openid profile email roles" }
             };
 
-            // Appel HTTP vers Keycloak
             var response = await _httpClient.PostAsync(
                 tokenUrl,
                 new FormUrlEncodedContent(formData)
             );
 
-            // Si Keycloak refuse (mauvais mdp, utilisateur bloqué...)
             if (!response.IsSuccessStatusCode)
                 return null;
 
-            // Désérialiser la réponse Keycloak
             var json = await response.Content.ReadAsStringAsync();
             var keycloakResponse = JsonSerializer.Deserialize<KeycloakTokenResponse>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (keycloakResponse == null) return null;
 
-            // Récupérer l'utilisateur depuis notre BD SQL Server
+            // ===== RÉCUPÉRER L'UTILISATEUR DEPUIS SQL SERVER =====
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            // Si l'utilisateur n'existe pas en base (ne devrait pas arriver)
+            if (user == null)
+                return null;
 
             return new LoginResponseDto
             {
+                UserId = user.Id,  // ← ID DE L'UTILISATEUR
                 AccessToken = keycloakResponse.access_token,
                 RefreshToken = keycloakResponse.refresh_token,
                 ExpiresIn = keycloakResponse.expires_in,
                 Role = request.Role,
-                FullName = user != null ? $"{user.FirstName} {user.LastName}" : request.Email
+                FullName = $"{user.FirstName} {user.LastName}"
             };
         }
 
@@ -88,35 +87,29 @@ namespace AssetFlow.Infrastructure.Services
         /// </summary>
         public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
         {
-            // Vérifier si l'email existe déjà dans notre BD
             var exists = await _dbContext.Users.AnyAsync(u => u.Email == request.Email);
             if (exists)
                 return new RegisterResponseDto { Success = false, Message = "Cet email existe déjà." };
 
-            // --- Étape 1 : Créer l'utilisateur dans Keycloak ---
-            // Pour créer un user Keycloak, on a besoin d'un token Admin
             var adminToken = await GetAdminTokenAsync();
             if (adminToken == null)
                 return new RegisterResponseDto { Success = false, Message = "Erreur connexion Keycloak admin." };
 
-            // URL admin Keycloak pour créer un user
             var createUserUrl = $"http://localhost:8080/admin/realms/assetflow/users";
 
-            // Corps de la requête de création
             var keycloakUser = new
             {
                 username = request.Email,
                 email = request.Email,
                 firstName = request.FirstName,
                 lastName = request.LastName,
-                enabled = true, // Activé de suite (ou false si approbation admin requise)
+                enabled = true,
                 credentials = new[]
                 {
                     new { type = "password", value = request.Password, temporary = false }
                 }
             };
 
-            // Appel API Keycloak avec le token admin
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", adminToken);
 
@@ -128,7 +121,6 @@ namespace AssetFlow.Infrastructure.Services
             if (!createResponse.IsSuccessStatusCode)
                 return new RegisterResponseDto { Success = false, Message = "Erreur création compte Keycloak." };
 
-            // --- Étape 2 : Sauvegarder dans SQL Server ---
             var user = new User
             {
                 FirstName = request.FirstName,
@@ -136,7 +128,7 @@ namespace AssetFlow.Infrastructure.Services
                 Email = request.Email,
                 Department = request.Department,
                 Role = request.RequestedRole,
-                IsApproved = false, // En attente d'approbation admin
+                IsApproved = false,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -150,20 +142,17 @@ namespace AssetFlow.Infrastructure.Services
             };
         }
 
-        /// <summary>
-        /// Obtient un token admin Keycloak pour les opérations d'administration
-        /// </summary>
         private async Task<string?> GetAdminTokenAsync()
         {
             var tokenUrl = "http://localhost:8080/realms/master/protocol/openid-connect/token";
 
             var formData = new Dictionary<string, string>
-    {
-        { "grant_type", "password" },
-        { "client_id", "admin-cli" },
-        { "username", _config["Keycloak:AdminUsername"]! },  // ← depuis config
-        { "password", _config["Keycloak:AdminPassword"]! }   // ← depuis config
-    };
+            {
+                { "grant_type", "password" },
+                { "client_id", "admin-cli" },
+                { "username", _config["Keycloak:AdminUsername"]! },
+                { "password", _config["Keycloak:AdminPassword"]! }
+            };
 
             var response = await _httpClient.PostAsync(tokenUrl, new FormUrlEncodedContent(formData));
             if (!response.IsSuccessStatusCode) return null;
@@ -175,7 +164,6 @@ namespace AssetFlow.Infrastructure.Services
             return tokenResponse?.access_token;
         }
 
-        // Classe interne pour désérialiser la réponse de Keycloak
         private class KeycloakTokenResponse
         {
             public string access_token { get; set; } = string.Empty;

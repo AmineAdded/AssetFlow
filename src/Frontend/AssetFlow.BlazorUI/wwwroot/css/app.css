@@ -145,7 +145,7 @@ body {
 
 /* Dark mode toggle */
 .theme-toggle {
-    position: fixed; top: 1.25rem; right: 1.25rem; z-index: 200;
+    position: fixed; top: 0.7rem; right: 1.25rem; z-index: 200;
     width: 44px; height: 44px; border-radius: 50%;
     border: 1px solid var(--border); background: var(--surface);
     color: var(--text); cursor: pointer;

@@ -1,6 +1,6 @@
 // ============================================================
 // AssetFlow.BlazorUI / Services / AuthService.cs
-// Service qui appelle l'API backend pour login/register
+// MISE À JOUR : Stocke UserId dans localStorage après login
 // ============================================================
 
 using System.Net.Http.Json;
@@ -8,7 +8,6 @@ using Blazored.LocalStorage;
 
 namespace AssetFlow.BlazorUI.Services
 {
-    /// <summary>DTO pour envoyer la demande de login au backend</summary>
     public class LoginRequest
     {
         public string Email { get; set; } = string.Empty;
@@ -16,9 +15,9 @@ namespace AssetFlow.BlazorUI.Services
         public string Role { get; set; } = string.Empty;
     }
 
-    /// <summary>DTO pour recevoir la réponse du backend après login</summary>
     public class LoginResponse
     {
+        public int UserId { get; set; }                    // ← NOUVEAU
         public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;
         public int ExpiresIn { get; set; }
@@ -26,7 +25,6 @@ namespace AssetFlow.BlazorUI.Services
         public string FullName { get; set; } = string.Empty;
     }
 
-    /// <summary>DTO pour l'inscription</summary>
     public class RegisterRequest
     {
         public string FirstName { get; set; } = string.Empty;
@@ -37,7 +35,6 @@ namespace AssetFlow.BlazorUI.Services
         public string RequestedRole { get; set; } = string.Empty;
     }
 
-    /// <summary>DTO pour la réponse d'inscription</summary>
     public class RegisterResponse
     {
         public bool Success { get; set; }
@@ -46,7 +43,6 @@ namespace AssetFlow.BlazorUI.Services
 
     /// <summary>
     /// Service d'authentification côté Blazor
-    /// Communique avec l'API backend
     /// </summary>
     public class AuthService
     {
@@ -60,7 +56,7 @@ namespace AssetFlow.BlazorUI.Services
         }
 
         /// <summary>
-        /// Appelle POST api/auth/login et stocke le token localement
+        /// Appelle POST api/auth/login et stocke les infos dans localStorage
         /// </summary>
         public async Task<(bool Success, string Message)> LoginAsync(LoginRequest request)
         {
@@ -73,10 +69,12 @@ namespace AssetFlow.BlazorUI.Services
                     var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
                     if (result != null)
                     {
-                        // Stocker le token dans le localStorage du navigateur
+                        // ===== STOCKAGE DANS LOCALSTORAGE =====
+                        await _localStorage.SetItemAsync("user_id", result.UserId);      // ← ID
                         await _localStorage.SetItemAsync("access_token", result.AccessToken);
                         await _localStorage.SetItemAsync("user_role", result.Role);
                         await _localStorage.SetItemAsync("user_name", result.FullName);
+
                         return (true, "Connexion réussie");
                     }
                 }
@@ -89,9 +87,6 @@ namespace AssetFlow.BlazorUI.Services
             }
         }
 
-        /// <summary>
-        /// Appelle POST api/auth/register
-        /// </summary>
         public async Task<(bool Success, string Message)> RegisterAsync(RegisterRequest request)
         {
             try
@@ -110,25 +105,33 @@ namespace AssetFlow.BlazorUI.Services
             }
         }
 
-        /// <summary>Déconnexion : supprime le token local</summary>
         public async Task LogoutAsync()
         {
+            await _localStorage.RemoveItemAsync("user_id");        // ← Supprimer ID
             await _localStorage.RemoveItemAsync("access_token");
             await _localStorage.RemoveItemAsync("user_role");
             await _localStorage.RemoveItemAsync("user_name");
         }
 
-        /// <summary>Vérifie si l'utilisateur est connecté</summary>
         public async Task<bool> IsAuthenticatedAsync()
         {
             var token = await _localStorage.GetItemAsync<string>("access_token");
             return !string.IsNullOrEmpty(token);
         }
 
-        /// <summary>Récupère le rôle stocké</summary>
         public async Task<string> GetUserRoleAsync()
         {
             return await _localStorage.GetItemAsync<string>("user_role") ?? string.Empty;
+        }
+
+        public async Task<int?> GetUserIdAsync()
+        {
+            return await _localStorage.GetItemAsync<int?>("user_id");
+        }
+
+        public async Task<string> GetUserNameAsync()
+        {
+            return await _localStorage.GetItemAsync<string>("user_name") ?? "Utilisateur";
         }
     }
 }
