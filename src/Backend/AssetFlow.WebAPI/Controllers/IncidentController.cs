@@ -45,20 +45,6 @@ namespace AssetFlow.WebAPI.Controllers
         }
 
         /// <summary>
-        /// GET api/incident/utilisateur/{utilisateurId}
-        /// Récupère tous les incidents d'un utilisateur
-        /// </summary>
-        [HttpGet("utilisateur/{utilisateurId}")]
-        public async Task<IActionResult> GetIncidentsUtilisateur(int utilisateurId)
-        {
-            if (utilisateurId <= 0)
-                return BadRequest("ID utilisateur invalide.");
-
-            var incidents = await _incidentService.GetIncidentsUtilisateurAsync(utilisateurId);
-            return Ok(incidents);
-        }
-
-        /// <summary>
         /// GET api/incident/affectation/{affectationId}
         /// NOUVEAU : Récupère tous les incidents liés à une affectation
         /// </summary>

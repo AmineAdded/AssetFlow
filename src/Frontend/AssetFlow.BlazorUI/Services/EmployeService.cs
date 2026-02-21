@@ -134,27 +134,5 @@ namespace AssetFlow.BlazorUI.Services
                 return null;
             }
         }
-
-        /// <summary>
-        /// Signale un incident sur un équipement
-        /// </summary>
-        public async Task<(bool Success, string Message)> SignalerIncidentAsync(SignalerIncidentDto incident)
-        {
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync("api/employe/incident", incident);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return (true, "Incident signalé avec succès");
-                }
-
-                return (false, "Erreur lors du signalement");
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Erreur : {ex.Message}");
-            }
-        }
     }
 }

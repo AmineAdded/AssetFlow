@@ -101,33 +101,6 @@ namespace AssetFlow.BlazorUI.Services
         }
 
         /// <summary>
-        /// Récupère tous les incidents de l'utilisateur connecté
-        /// </summary>
-        public async Task<List<IncidentDto>> GetMesIncidentsAsync()
-        {
-            try
-            {
-                var userId = await _localStorage.GetItemAsync<int?>("user_id");
-                if (userId == null)
-                    return new List<IncidentDto>();
-
-                var response = await _httpClient.GetAsync($"api/incident/utilisateur/{userId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var incidents = await response.Content.ReadFromJsonAsync<List<IncidentDto>>();
-                    return incidents ?? new List<IncidentDto>();
-                }
-
-                return new List<IncidentDto>();
-            }
-            catch
-            {
-                return new List<IncidentDto>();
-            }
-        }
-
-        /// <summary>
         /// Récupère tous les incidents liés à une affectation spécifique
         /// NOUVEAU : utilisé dans DetailsEquipement pour afficher l'historique des incidents
         /// </summary>

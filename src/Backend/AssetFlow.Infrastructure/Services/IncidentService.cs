@@ -77,21 +77,6 @@ namespace AssetFlow.Infrastructure.Services
         }
 
         /// <summary>
-        /// Récupère tous les incidents d'un utilisateur
-        /// </summary>
-        public async Task<List<IncidentDto>> GetIncidentsUtilisateurAsync(int utilisateurId)
-        {
-            var incidents = await _context.Incidents
-                .Include(i => i.Affectation)
-                .ThenInclude(a => a.Materiel)
-                .Where(i => i.Affectation.UtilisateurId == utilisateurId)
-                .OrderByDescending(i => i.DateIncident)
-                .ToListAsync();
-
-            return incidents.Select(MapToDto).ToList();
-        }
-
-        /// <summary>
         /// NOUVEAU : Récupère tous les incidents liés à une affectation
         /// </summary>
         public async Task<List<IncidentDto>> GetIncidentsByAffectationAsync(int affectationId)

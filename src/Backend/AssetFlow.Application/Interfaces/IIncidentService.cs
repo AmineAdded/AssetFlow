@@ -18,11 +18,6 @@ namespace AssetFlow.Application.Interfaces
         Task<SignalerIncidentResponseDto> SignalerIncidentAsync(SignalerIncidentRequestDto request);
 
         /// <summary>
-        /// Récupère tous les incidents d'un utilisateur
-        /// </summary>
-        Task<List<IncidentDto>> GetIncidentsUtilisateurAsync(int utilisateurId);
-
-        /// <summary>
         /// Récupère tous les incidents liés à une affectation
         /// NOUVEAU : utilisé dans la page DetailsEquipement
         /// </summary>
