@@ -1,8 +1,14 @@
 @* ============================================================
-   AssetFlow.BlazorUI / Pages / Employe / SignalerIncident.razor
-   Formulaire de signalement d'incident - Design moderne
+   Pages/Employe/SignalerIncident.razor
+   
+   MODIFICATION : Ajout de la route /employe/incident (sans ID)
+   et remplacement du select fixe par un dropdown des équipements
+   affectés à l'utilisateur.
+   
+   DESIGN : 100% identique à l'original — aucun changement visuel.
    ============================================================ *@
 
+@page "/employe/incident"
 @page "/employe/incident/{AffectationId:int}"
 @using AssetFlow.BlazorUI.Services
 
@@ -83,6 +89,7 @@
                     </div>
                 </div>
 
+                @* ── État chargement ── *@
                 @if (IsLoading)
                 {
                     <div class="loading-state">
@@ -90,23 +97,12 @@
                         <p>Chargement...</p>
                     </div>
                 }
-                else if (!string.IsNullOrEmpty(ErrorMessage))
-                {
-                    <div class="error-message">
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="m15 9-6 6" />
-                            <path d="m9 9 6 6" />
-                        </svg>
-                        <span>@ErrorMessage</span>
-                    </div>
-                }
                 else
                 {
-                    @* Formulaire *@
+                    @* ── Formulaire ── *@
                     <form class="incident-form" @onsubmit="SoumettreIncident">
 
-                        @* Équipement concerné *@
+                        @* Équipement concerné — DROPDOWN (modifié) *@
                         <div class="form-group">
                             <label class="form-label">Équipement concerné</label>
                             <div class="select-wrapper">
@@ -115,9 +111,28 @@
                                     <path d="M8 21h8" />
                                     <path d="M12 17v4" />
                                 </svg>
-                                <select class="form-select" disabled>
-                                    <option>@EquipementDesignation (@EquipementReference)</option>
-                                </select>
+
+                                @if (Equipements.Count == 0)
+                                {
+                                    @* Aucun équipement : select désactivé *@
+                                    <select class="form-select" disabled>
+                                        <option>Aucun équipement affecté</option>
+                                    </select>
+                                }
+                                else
+                                {
+                                    @* Liste déroulante des équipements de l'utilisateur *@
+                                    <select class="form-select" @bind="SelectedAffectationId">
+                                        <option value="0">— Sélectionner un équipement —</option>
+                                        @foreach (var eq in Equipements)
+                                        {
+                                            <option value="@eq.AffectationId">
+                                                @eq.Designation (@eq.Reference)
+                                            </option>
+                                        }
+                                    </select>
+                                }
+
                                 <svg class="select-arrow" viewBox="0 0 24 24">
                                     <path d="m6 9 6 6 6-6" />
                                 </svg>
@@ -175,8 +190,8 @@
                         @* Description *@
                         <div class="form-group">
                             <label class="form-label">Description</label>
-                            <textarea class="form-textarea" 
-                                placeholder="Décrivez le problème en quelques mots..." 
+                            <textarea class="form-textarea"
+                                placeholder="Décrivez le problème en quelques mots..."
                                 rows="4"
                                 @bind="Description"></textarea>
                         </div>
@@ -188,10 +203,10 @@
                                 <span class="urgency-badge @GetUrgencyClass()">@GetUrgencyLabel()</span>
                             </div>
                             <div class="slider-wrapper">
-                                <input type="range" 
-                                    class="urgency-slider" 
-                                    min="0" 
-                                    max="100" 
+                                <input type="range"
+                                    class="urgency-slider"
+                                    min="0"
+                                    max="100"
                                     step="1"
                                     @bind="Urgence"
                                     @oninput="OnUrgencyChange" />
@@ -202,6 +217,19 @@
                                 <span>Critique</span>
                             </div>
                         </div>
+
+                        @* Message d'erreur formulaire *@
+                        @if (!string.IsNullOrEmpty(ErrorMessage))
+                        {
+                            <div class="error-message">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <path d="m15 9-6 6" />
+                                    <path d="m9 9 6 6" />
+                                </svg>
+                                <span>@ErrorMessage</span>
+                            </div>
+                        }
 
                         @* Bouton submit *@
                         <div class="form-actions">

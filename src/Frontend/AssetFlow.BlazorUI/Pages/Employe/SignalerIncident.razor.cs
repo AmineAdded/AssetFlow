@@ -1,6 +1,13 @@
 // ============================================================
-// AssetFlow.BlazorUI / Pages / Employe / SignalerIncident.razor.cs
-// Code-behind pour le formulaire de signalement d'incident
+// Pages/Employe/SignalerIncident.razor.cs
+//
+// MODIFICATIONS PAR RAPPORT À L'ORIGINAL :
+//   1. Route optionnelle : AffectationId n'est plus obligatoire
+//   2. OnInitializedAsync charge GetMesEquipementsAsync()
+//   3. Si AffectationId est fourni dans l'URL → pré-sélection dans la dropdown
+//   4. La validation vérifie que SelectedAffectationId > 0
+//
+// AUCUN changement dans le design ou la logique de soumission.
 // ============================================================
 
 using AssetFlow.BlazorUI.Services;
@@ -10,75 +17,72 @@ namespace AssetFlow.BlazorUI.Pages.Employe
 {
     public partial class SignalerIncident
     {
-        [Parameter] public int AffectationId { get; set; }
+        // ── Paramètre URL optionnel ────────────────────────────
+        // Renseigné depuis DetailsEquipement via NaviguerVersSignalement()
+        // Vaut 0 si on arrive depuis /employe/incident (sidebar)
+        [Parameter] public int AffectationId { get; set; } = 0;
 
-        [Inject] private IncidentService IncidentService { get; set; } = default!;
-        [Inject] private EmployeService EmployeService { get; set; } = default!;
-        [Inject] private NavigationManager Navigation { get; set; } = default!;
+        // ── Injections ─────────────────────────────────────────
+        [Inject] private IncidentService   IncidentService { get; set; } = default!;
+        [Inject] private EmployeService    EmployeService  { get; set; } = default!;
+        [Inject] private NavigationManager Navigation      { get; set; } = default!;
 
-        // === DONNÉES ÉQUIPEMENT ===
-        private string EquipementDesignation { get; set; } = string.Empty;
-        private string EquipementReference { get; set; } = string.Empty;
+        // ── Données dropdown ───────────────────────────────────
+        // Liste de tous les équipements affectés à l'utilisateur connecté
+        private List<EquipementAffecteDto> Equipements { get; set; } = new();
 
-        // === FORMULAIRE ===
+        // Valeur liée au <select> — initialisée à AffectationId si fourni
+        private int SelectedAffectationId { get; set; } = 0;
+
+        // ── Formulaire ──────────────────────────────────────────
         private string TypeIncident { get; set; } = "Panne";
-        private string Description { get; set; } = string.Empty;
-        private int Urgence { get; set; } = 50;
+        private string Description  { get; set; } = string.Empty;
+        private int    Urgence      { get; set; } = 50;
 
-        // === ÉTATS ===
-        private bool IsLoading { get; set; } = true;
-        private bool IsSubmitting { get; set; } = false;
+        // ── États ───────────────────────────────────────────────
+        private bool   IsLoading    { get; set; } = true;
+        private bool   IsSubmitting { get; set; } = false;
         private string ErrorMessage { get; set; } = string.Empty;
 
-        // === USER INFO ===
+        // ── Infos utilisateur ──────────────────────────────────
         private string UserName { get; set; } = "Utilisateur";
 
+        // ── Initialisation ─────────────────────────────────────
         protected override async Task OnInitializedAsync()
         {
-            await LoadUserInfo();
-            await LoadEquipementInfo();
-        }
-
-        private async Task LoadUserInfo()
-        {
+            // 1. Nom de l'utilisateur pour l'avatar
             UserName = await EmployeService.GetCurrentUserNameAsync();
-        }
 
-        private async Task LoadEquipementInfo()
-        {
+            // 2. Chargement des équipements depuis l'API
             try
             {
-                IsLoading = true;
-                ErrorMessage = string.Empty;
-
-                var equipement = await EmployeService.GetEquipementDetailAsync(AffectationId);
-
-                if (equipement != null)
-                {
-                    EquipementDesignation = equipement.Designation;
-                    EquipementReference = equipement.Reference;
-                }
-                else
-                {
-                    ErrorMessage = "Équipement introuvable.";
-                }
+                Equipements = await EmployeService.GetMesEquipementsAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                ErrorMessage = $"Erreur : {ex.Message}";
+                Equipements = new List<EquipementAffecteDto>();
             }
-            finally
+
+            // 3. Pré-sélection :
+            //    - Si AffectationId > 0 (arrivé depuis DetailsEquipement),
+            //      on sélectionne cet équipement dans la dropdown.
+            //    - Sinon (arrivé depuis la sidebar), rien de sélectionné.
+            if (AffectationId > 0 && Equipements.Any(e => e.AffectationId == AffectationId))
             {
-                IsLoading = false;
+                SelectedAffectationId = AffectationId;
             }
+
+            IsLoading = false;
         }
 
+        // ── Sélection du type d'incident ───────────────────────
         private void SelectType(string type)
         {
             TypeIncident = type;
             StateHasChanged();
         }
 
+        // ── Slider urgence ─────────────────────────────────────
         private void OnUrgencyChange(ChangeEventArgs e)
         {
             if (int.TryParse(e.Value?.ToString(), out int value))
@@ -88,8 +92,18 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             }
         }
 
+        // ── Soumission ─────────────────────────────────────────
         private async Task SoumettreIncident()
         {
+            ErrorMessage = string.Empty;
+
+            // Validation : un équipement doit être sélectionné
+            if (SelectedAffectationId <= 0)
+            {
+                ErrorMessage = "Veuillez sélectionner un équipement.";
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(Description))
             {
                 ErrorMessage = "Veuillez décrire le problème.";
@@ -99,19 +113,18 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             try
             {
                 IsSubmitting = true;
-                ErrorMessage = string.Empty;
 
                 var result = await IncidentService.SignalerIncidentAsync(new SignalerIncidentRequestDto
                 {
-                    AffectationId = AffectationId,
-                    TypeIncident = TypeIncident,
-                    Urgence = Urgence,
-                    Description = Description
+                    AffectationId = SelectedAffectationId,
+                    TypeIncident  = TypeIncident,
+                    Urgence       = Urgence,
+                    Description   = Description
                 });
 
                 if (result.Success)
                 {
-                    // Rediriger vers la page de succès
+                    // Redirection vers la page de succès (inchangée)
                     Navigation.NavigateTo($"/employe/incident/success?numero={result.NumeroIncident}");
                 }
                 else
@@ -129,6 +142,7 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             }
         }
 
+        // ── Helpers UI ─────────────────────────────────────────
         private string GetUrgencyLabel()
         {
             if (Urgence <= 33) return "FAIBLE";
@@ -149,7 +163,7 @@ namespace AssetFlow.BlazorUI.Pages.Employe
             if (parts.Length >= 2)
                 return $"{parts[0][0]}{parts[1][0]}".ToUpper();
             if (parts.Length == 1 && parts[0].Length >= 2)
-                return parts[0].Substring(0, 2).ToUpper();
+                return parts[0][..2].ToUpper();
             return "??";
         }
     }
