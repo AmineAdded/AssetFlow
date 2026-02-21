@@ -13,25 +13,17 @@
 
 /* === HEADER === */
 .incident-header {
-    height: 64px;
-    background: var(--surface);
     border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 1rem 1.5rem;
+    background: var(--surface);
 }
 
 html.dark .incident-header {
-    background: rgba(16, 24, 34, 0.8);
+    background: #101822;
     border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -49,7 +41,7 @@ html.dark .incident-header {
     height: 42px;
     flex-shrink: 0;
     display: flex;
-    align-items: left;
+    align-items: center;
     justify-content: center;
 }
 
@@ -82,9 +74,8 @@ html.dark .incident-header {
     letter-spacing: -0.03em;
 }
 
-/* Legacy - kept for compatibility */
 .logo-text {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text);
     margin: 0;
